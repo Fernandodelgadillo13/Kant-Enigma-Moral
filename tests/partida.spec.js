@@ -26,7 +26,9 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
 
   // Pregunta previa (sin nota) con retroalimentación
   await openReading(page, "r1");
-  await expect(page.locator(".frag-pending")).toContainText("FRAGMENTO PENDIENTE");
+  // El fragmento de García Morente aparece separado de la explicación
+  await expect(page.locator(".panel.fragment .kant-quote")).toContainText("Todo conocimiento racional");
+  await expect(page.locator(".panel.fragment .ref")).toContainText("García Morente");
   await expect(page.locator(".label-noquote")).toHaveText("Explicación (no es cita)");
   const correctPre = await page.evaluate(() => window.KANT_CONTENT.lecturas[0].pregunta.opciones.findIndex((o) => o.correcta));
   await page.check(`input[name="pre"][value="${correctPre}"]`);
@@ -176,4 +178,47 @@ test("fragmento pegado por el docente aparece separado de la explicación", asyn
   await expect(page.locator(".kant-quote")).toContainText("TEXTO DE PRUEBA DEL DOCENTE");
   await expect(page.locator(".panel.fragment .ref")).toContainText("Edición del curso · p. 10");
   await expect(page.locator(".panel.explain .kant-quote")).toHaveCount(0);
+});
+
+test("archivo de fragmentos: el docente lo descarga y otra pareja lo carga sin publicarlo", async ({ page, browser }) => {
+  // Docente: pega un fragmento y descarga el archivo
+  await startGame(page);
+  await page.goto("/#/docente");
+  await page.fill("#pin", await page.evaluate(() => window.KANT_CONFIG.teacherPin));
+  await page.click("button:has-text('Entrar')");
+  await page.click("[data-tab=fragmentos]");
+  await page.fill("#fx-r5", "FRAGMENTO PRIVADO DE PRUEBA [...] continúa.");
+  await page.fill("#fe-r5", "Edición del curso");
+  await page.fill("#fp-r5", "Ak. IV 394");
+  await page.click("button:has-text('Guardar fragmentos')");
+  const [dl] = await Promise.all([page.waitForEvent("download"), page.click("button:has-text('Descargar archivo de fragmentos')")]);
+  expect(dl.suggestedFilename()).toBe("fragmentos-kant.json");
+  const filePath = await dl.path();
+
+  // El texto NO está en los archivos publicados
+  const published = await page.evaluate(() => fetch("/js/content.js").then((r) => r.text()));
+  expect(published).not.toContain("FRAGMENTO PRIVADO DE PRUEBA");
+
+  // Otra pareja, en otro navegador (sin datos), carga el archivo desde el inicio
+  const ctx = await browser.newContext();
+  const p2 = await ctx.newPage();
+  await p2.goto("/");
+  await expect(p2.locator("#frag-status")).toContainText("10 de 10"); // García Morente ya viene incluido
+  await p2.setInputFiles("#frag-file-start", filePath);
+  await expect(p2.locator("#frag-status")).toContainText("10 de 10");
+  await p2.fill("#n1", "Carla"); await p2.fill("#n2", "Diego"); await p2.check("#rules-ok");
+  await p2.click("button:has-text('Entrar a la biblioteca')");
+  await p2.evaluate(() => { const s = window.__kant.state(); s.seals.z1 = true; });
+  await p2.goto("/#/lectura/r5");
+  await expect(p2.locator(".kant-quote")).toContainText("FRAGMENTO PRIVADO DE PRUEBA");
+  await expect(p2.locator(".panel.fragment .ref")).toContainText("Edición del curso · Ak. IV 394");
+
+  // El archivo reemplaza solo la lectura que trae; las demás conservan García Morente
+  await p2.goto("/#/lectura/r6");
+  await expect(p2.locator(".kant-quote")).toContainText("Prescindo aquí");
+  // Un archivo inválido se rechaza sin romper nada
+  await p2.goto("/#/inicio");
+  await p2.setInputFiles("#frag-file-start", { name: "otro.json", mimeType: "application/json", buffer: Buffer.from('{"hola":1}') });
+  await expect(p2.locator(".toast-item").last()).toContainText("no es un archivo de fragmentos");
+  await ctx.close();
 });

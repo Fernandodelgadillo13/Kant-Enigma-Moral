@@ -76,7 +76,7 @@ async function solve(page, cid, opts = {}) {
     await page.fill("#open-text", opts.text || "Ejemplo propio: dos compañeros devuelven un libro de la biblioteca a tiempo. Uno lo hace solo para evitar la multa (conforme al deber); el otro, porque reconoce que es su deber. Por fuera es igual; la diferencia está en el motivo.");
     for (const k of ["concepto", "texto", "razonamiento"]) await page.check(`#self-${k}-${opts.self ?? 2}`);
     await page.click("button:has-text('Enviar respuesta')");
-    await expect(page.locator("text=Respuesta enviada")).toBeVisible();
+    await expect(page.locator("#open-form .feedback")).toContainText("Respuesta enviada");
     return;
   }
   for (let i = 0; i < (opts.wrongFirst || 0); i++) {
