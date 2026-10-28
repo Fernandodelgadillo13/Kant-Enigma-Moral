@@ -22,7 +22,7 @@ window.KANT_CONFIG = {
      IMPORTANTE: no es una medida de seguridad real; solo evita que los
      estudiantes entren por accidente. Cualquiera que lea el código puede
      verla. Cámbiala antes de usar la actividad. */
-  teacherPin: "kant1785",
+  teacherPin: "Df.22793",
 
   /* ---------------- Puntaje de evaluación (PE) ----------------
      Porcentaje del valor del desafío que se obtiene según el intento
