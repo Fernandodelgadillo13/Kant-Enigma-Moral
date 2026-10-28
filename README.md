@@ -9,16 +9,17 @@ Trabaja **solo** el Prefacio y la Primera sección de la *Fundamentación de la 
 
 ## Sobre los textos de Kant
 
-La aplicación **no contiene citas** de ninguna traducción. Cada lectura tiene:
+Las explicaciones, casos y preguntas son originales. Los **fragmentos textuales incluidos** son de la traducción de **Manuel García Morente (1921), de dominio público**. Se cotejaron con dos copias digitales de esa traducción (UNAM y la edición de P. M. Rosario Barbosa). Como ambas comparten digitalización, solo se corrigieron erratas evidentes, y en la Lectura 10 una repetición dudosa quedó marcada con [...]. Conviene una revisión final contra el facsímil de 1921 en Wikisource. Cada lectura tiene:
 
 1. **Contexto filosófico**: qué problema investiga Kant.
 2. **Explicación didáctica original**, rotulada «Explicación (no es cita)».
-3. **Lectura de referencia**: un panel visible, dentro de la página, donde el docente agrega un fragmento de la edición autorizada del curso. Mientras está vacío, muestra «FRAGMENTO PENDIENTE — lo agrega el docente» y la actividad funciona igual.
+3. **Lectura de referencia**: un panel visible, dentro de la página, con el fragmento de Kant (García Morente) y su paginación académica. El docente puede reemplazarlo por otra edición. Si un panel queda vacío, muestra «FRAGMENTO PENDIENTE — lo agrega el docente» y la actividad funciona igual.
 4. **Desafío interactivo**: una pregunta previa sin nota y los desafíos evaluados.
 
-El docente puede agregar los fragmentos de dos maneras:
-- **Panel docente → Fragmentos de lectura**: se guardan solo en ese navegador. El botón «Copiar como código para content.js» genera el texto para el paso siguiente.
-- **`public/js/content.js`**: complete `fragmento: { texto, edicion, pagina }` en cada lectura y vuelva a desplegar. Así el fragmento aparece en todos los equipos.
+El docente puede agregar los fragmentos de tres maneras:
+- **Panel docente → Fragmentos de lectura**: se guardan solo en ese navegador.
+- **Archivo de fragmentos (recomendado para traducciones con derechos vigentes)**: en el panel, «Descargar archivo de fragmentos» genera `fragmentos-kant.json`. Compártalo por un canal cerrado del curso (Classroom, correo, pendrive) y **no lo suba a GitHub**. Cada pareja lo carga con «Cargar archivo de fragmentos» en la pantalla de inicio o en cualquier lectura. El texto no queda publicado en el sitio.
+- **`public/js/content.js`**: complete `fragmento: { texto, edicion, pagina }` y vuelva a desplegar. **Solo para textos de dominio público** (por ejemplo, García Morente, 1921), porque este archivo queda publicado en el sitio y en el repositorio.
 
 La «ubicación sugerida» (Ak. IV) de cada lectura viene de la planificación de la actividad. Confírmela con su edición.
 
@@ -66,6 +67,7 @@ Las pruebas hacen lo siguiente:
 - **Décimas con la tabla modificada**: desde el panel docente se cambian los tramos y se comprueba que el informe pasa de 4 a 3 décimas. Después se validan las respuestas abiertas y se verifica que se recalculen el porcentaje y las décimas.
 - **Zonas y desafíos desactivados**: verifican que se recalcula el máximo de PE.
 - **Fragmento del docente**: se muestra separado de la explicación.
+- **Archivo de fragmentos**: el docente lo descarga, otra pareja lo carga en un navegador limpio, y se verifica que el texto no aparece en los archivos publicados.
 - **Vista móvil** (Pixel 7): sin desbordamiento horizontal, botones de al menos 44 px y letra de al menos 16 px. También prueban los controles de tamaño de letra y fondo claro.
 
 ## Publicar en Firebase Hosting con GitHub
@@ -157,5 +159,5 @@ Los cambios del panel quedan en ese navegador y tienen prioridad sobre `config.j
 
 - **Almacenamiento**: el progreso vive solo en el navegador de cada equipo. Si se borran los datos del navegador, se usa una ventana privada estricta o se cambia de equipo, se pierde. Si el navegador bloquea `localStorage`, la app avisa y funciona en memoria (se pierde al recargar). Por eso cada pareja debe **imprimir o descargar su informe**.
 - **Validación docente**: se hace en el mismo navegador de la pareja, desde el informe y con la sesión docente abierta.
-- **Despliegue**: los archivos de Firebase y GitHub Actions siguen la configuración estándar, pero **no se probaron contra un proyecto Firebase real**. Las pruebas Playwright sí se ejecutaron localmente y pasan (5/5).
+- **Despliegue**: los archivos de Firebase y GitHub Actions siguen la configuración estándar, pero **no se probaron contra un proyecto Firebase real**. Las pruebas Playwright se ejecutaron localmente y pasan (6/6).
 - **Fragmentos**: la app no incluye texto de Kant. El docente es responsable de usar fragmentos de una edición que pueda reproducir y de citar edición y página.
