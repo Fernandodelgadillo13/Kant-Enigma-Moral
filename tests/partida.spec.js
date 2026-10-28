@@ -87,7 +87,7 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
 
   // Docente: modifica la tabla de décimas
   await page.goto("/#/docente");
-  await page.fill("#pin", "kant1785");
+  await page.fill("#pin", await page.evaluate(() => window.KANT_CONFIG.teacherPin));
   await page.click("button:has-text('Entrar')");
   await page.click("[data-tab=decimas]");
   // Nueva tabla: 0→0, 50→1, 70→2, 85→3, 96→4, 100→5
@@ -133,7 +133,7 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
 
   // Reiniciar para otra pareja conserva la tabla modificada
   await page.goto("/#/docente");
-  await page.fill("#pin", "kant1785");
+  await page.fill("#pin", await page.evaluate(() => window.KANT_CONFIG.teacherPin));
   await page.click("button:has-text('Entrar')");
   await page.click("[data-tab=reiniciar]");
   page.once("dialog", (d) => d.accept());
@@ -148,7 +148,7 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
 test("desactivar desafíos y zonas recalcula el máximo de PE", async ({ page }) => {
   await startGame(page);
   await page.goto("/#/docente");
-  await page.fill("#pin", "kant1785");
+  await page.fill("#pin", await page.evaluate(() => window.KANT_CONFIG.teacherPin));
   await page.click("button:has-text('Entrar')");
   await page.click("[data-tab=zonas]");
   await page.uncheck('.ch-toggle[value="c1"]');           // entrega la letra P automáticamente
@@ -164,7 +164,7 @@ test("desactivar desafíos y zonas recalcula el máximo de PE", async ({ page })
 test("fragmento pegado por el docente aparece separado de la explicación", async ({ page }) => {
   await startGame(page);
   await page.goto("/#/docente");
-  await page.fill("#pin", "kant1785");
+  await page.fill("#pin", await page.evaluate(() => window.KANT_CONFIG.teacherPin));
   await page.click("button:has-text('Entrar')");
   await page.click("[data-tab=fragmentos]");
   await page.fill("#fx-r4", "TEXTO DE PRUEBA DEL DOCENTE [...] segunda parte.");

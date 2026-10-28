@@ -42,7 +42,7 @@ test("vista móvil: inicio, mapa, lectura, desafío, informe y panel docente", a
   await noHorizontalOverflow(page);
 
   await page.goto("/#/docente");
-  await page.fill("#pin", "kant1785");
+  await page.fill("#pin", await page.evaluate(() => window.KANT_CONFIG.teacherPin));
   await page.click("button:has-text('Entrar')");
   await page.click("[data-tab=decimas]");
   await noHorizontalOverflow(page);
