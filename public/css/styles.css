@@ -274,7 +274,7 @@ body[data-view="docente"] main { max-width: 1100px; }
 .frag-fs textarea { min-height: 7rem; }
 
 /* ---------- Toast y overlay ---------- */
-.toast { position: fixed; bottom: 1rem; right: 1rem; display: flex; flex-direction: column; gap: .5rem; z-index: 60; }
+.toast { pointer-events: none; position: fixed; bottom: 1rem; right: 1rem; display: flex; flex-direction: column; gap: .5rem; z-index: 60; }
 .toast-item { background: var(--panel2); border: 1px solid var(--gold); color: var(--text); padding: .6rem 1rem; border-radius: 10px; box-shadow: var(--shadow); animation: slidein .3s ease; transition: opacity .5s; }
 .toast-item.out { opacity: 0; }
 .overlay { position: fixed; inset: 0; background: rgba(3, 6, 18, .78); display: grid; place-items: center; z-index: 80; padding: 1rem; }
@@ -347,3 +347,7 @@ body.light .tab.on { background: #b23a4c; color: #fff; }
   .student-answer { background: #f3f3f3; }
   .muted { color: #333; }
 }
+
+/* Botón para cargar archivo de fragmentos */
+.file-btn { cursor: pointer; font-weight: 600; }
+.frag-file:focus-visible + .file-btn { outline: 3px solid var(--focus); outline-offset: 2px; }
