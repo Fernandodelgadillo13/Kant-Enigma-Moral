@@ -17,6 +17,17 @@
    igual con la explicación original.
 
    Use [...] para marcar los cortes dentro de un fragmento.
+
+   FRAGMENTOS INCLUIDOS: traducción de Manuel García Morente (1921),
+   de dominio público (el traductor murió en 1942). Se cotejaron con dos
+   copias digitales de esa traducción (Instituto de Investigaciones
+   Filosóficas, UNAM, y la edición digital de P. M. Rosario Barbosa, 2007).
+   Ambas comparten una digitalización, por lo que se corrigieron solo
+   erratas evidentes («en tomo suyo» → «en torno suyo», «lo basta» →
+   «le basta», «unía» → «una»). En la Lectura 10 se marcó con [...] una
+   repetición dudosa de la digitalización. Conviene una revisión final
+   contra el facsímil de 1921 en Wikisource.
+   Solo deben ir aquí textos de dominio público: este archivo se publica.
    La "ubicación sugerida" (Ak. IV) proviene de la planificación de la
    actividad; confírmela con su edición antes de usarla.
 
@@ -142,7 +153,11 @@ window.KANT_CONTENT = {
         { termino: "Antropología práctica", definicion: "Parte empírica de la ética: cómo actúan de hecho los seres humanos." },
         { termino: "Metafísica de las costumbres", definicion: "Parte pura de la ética: los principios morales que da la razón." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "Todo conocimiento racional, o es material y considera algún objeto, o es formal y se ocupa tan sólo de la forma del entendimiento y de la razón misma, y de las reglas universales del pensar en general, sin distinción de objetos. La filosofía formal se llama lógica; la filosofía material, empero, que tiene referencia a determinados objetos y a las leyes a que éstos están sometidos, se divide a su vez en dos. Porque las leyes son, o leyes de la naturaleza, o leyes de la libertad. La ciencia de las primeras llámase física; la de las segundas, ética; aquélla también suele llamarse teoría de la naturaleza, y ésta, teoría de las costumbres. [...]\n\nPuede llamarse empírica toda filosofía que arraiga en fundamentos de la experiencia; pero la que presenta sus teorías derivándolas exclusivamente de principios a priori, se llama filosofía pura. Esta última, cuando es meramente formal, se llama lógica; pero si se limita a determinados objetos del entendimiento, se llama entonces metafísica. De esta manera se origina la idea de una doble metafísica, una metafísica de la naturaleza y una metafísica de las costumbres. La física, pues, tendrá su parte empírica, pero también una parte racional; la ética igualmente, aun cuando aquí la parte empírica podría llamarse especialmente antropología práctica, y la parte racional, propiamente moral.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 387–388"
+      },
       trabajoFragmento: "Busquen en el fragmento las palabras que nombran la parte empírica y la parte racional de la ética. ¿Cuál de las dos estudiará Kant en esta obra?",
       pregunta: {
         enunciado: "Según la explicación, ¿qué estudia la parte pura de la ética?",
@@ -170,7 +185,11 @@ window.KANT_CONTENT = {
         { termino: "Regla práctica", definicion: "Indicación útil basada (aunque sea en parte) en la experiencia." },
         { termino: "Ley moral", definicion: "Mandato con necesidad absoluta, fundado a priori en la razón." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "Todo el mundo ha de confesar que una ley, para valer moralmente, esto es, como fundamento de una obligación, tiene que llevar consigo una necesidad absoluta; que el mandato siguiente: no debes mentir, no tiene su validez limitada a los hombres, como si otros seres racionales pudieran desentenderse de él, y asimismo las demás leyes propiamente morales; que, por lo tanto, el fundamento de la obligación no debe buscarse en la naturaleza del hombre o en las circunstancias del universo en que el hombre está puesto, sino a priori exclusivamente en conceptos de la razón pura, y que cualquier otro precepto que se funde en principios de la mera experiencia, incluso un precepto que, siendo universal en cierto respecto, se asiente en fundamentos empíricos, aunque no fuese más que en una mínima parte, acaso tan sólo por un motivo de determinación, podrá llamarse una regla práctica, pero nunca una ley moral.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 389"
+      },
       trabajoFragmento: "Identifiquen en el fragmento el ejemplo que usa Kant y la expresión que muestra que la ley vale para todo ser racional, no solo para los humanos.",
       pregunta: {
         enunciado: "\"Si no mientes, la gente confiará en ti y te irá mejor\". Para Kant, esta frase es…",
@@ -198,7 +217,11 @@ window.KANT_CONTENT = {
         { termino: "Principio supremo de la moralidad", definicion: "El criterio último del que depende juzgar qué es moral; es lo que busca esta obra." },
         { termino: "Conocimiento moral común", definicion: "Lo que cualquier persona razonable ya sabe sobre el bien, aunque no lo formule filosóficamente." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "Porque lo que debe ser moralmente bueno no basta que sea conforme a la ley moral, sino que tiene que suceder por la ley moral; de lo contrario, esa conformidad será muy contingente e incierta, porque el fundamento inmoral producirá a veces acciones conformes a la ley, aun cuando más a menudo las produzca contrarias. [...]\n\nSin embargo, la presente fundamentación no es más que la investigación y asiento del principio supremo de la moralidad, que constituye un asunto aislado, completo en su propósito, y que ha de separarse de cualquier otra investigación moral.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 390 y 392"
+      },
       trabajoFragmento: "Ubiquen en el fragmento las dos expresiones que Kant contrapone (coincidir con la ley / actuar por la ley) y la frase que indica qué busca la obra.",
       pregunta: {
         enunciado: "¿Por qué, según Kant, una simple coincidencia con la ley moral es \"frágil\"?",
@@ -229,7 +252,11 @@ window.KANT_CONTENT = {
         { termino: "Cualidades del temperamento", definicion: "Rasgos de carácter: valentía, decisión, perseverancia." },
         { termino: "Dones de la fortuna", definicion: "Bienes que dependen en parte de la suerte: poder, riqueza, honor, salud, bienestar." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "Ni en el mundo, ni, en general, tampoco fuera del mundo, es posible pensar nada que pueda considerarse como bueno sin restricción, a no ser tan sólo una buena voluntad. El entendimiento, el gracejo, el Juicio, o como quieran llamarse los talentos del espíritu; el valor, la decisión, la perseverancia en los propósitos, como cualidades del temperamento, son, sin duda, en muchos respectos, buenos y deseables; pero también pueden llegar a ser extraordinariamente malos y dañinos si la voluntad que ha de hacer uso de estos dones de la naturaleza, y cuya peculiar constitución se llama por eso carácter, no es buena. Lo mismo sucede con los dones de la fortuna.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 393"
+      },
       trabajoFragmento: "Hagan una lista con los talentos, cualidades y dones que aparecen en el fragmento. ¿Qué condición pone Kant para que sean buenos?",
       pregunta: {
         enunciado: "Una persona muy valiente usa su valentía para intimidar a otros. ¿Qué mostraría este caso según Kant?",
@@ -257,7 +284,11 @@ window.KANT_CONTENT = {
         { termino: "Utilidad", definicion: "Capacidad de producir resultados; no aumenta ni disminuye el valor de la buena voluntad." },
         { termino: "Imagen de la joya", definicion: "La buena voluntad brilla por sí misma, aunque no logre su propósito." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "La buena voluntad no es buena por lo que efectúe o realice, no es buena por su adecuación para alcanzar algún fin que nos hayamos propuesto; es buena sólo por el querer, es decir, es buena en sí misma. [...]\n\nAun cuando, por particulares enconos del azar o por la mezquindad de una naturaleza madrastra, le faltase por completo a esa voluntad la facultad de sacar adelante su propósito; si, a pesar de sus mayores esfuerzos, no pudiera llevar a cabo nada y sólo quedase la buena voluntad —no desde luego como un mero deseo, sino como el acopio de todos los medios que están en nuestro poder—, sería esa buena voluntad como una joya brillante por sí misma [...]\n\nLa utilidad o la esterilidad no pueden ni añadir ni quitar nada a ese valor.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 394"
+      },
       trabajoFragmento: "Busquen en el fragmento la imagen de la joya y la aclaración de que la buena voluntad no es un mero deseo. ¿Qué agrega cada una?",
       pregunta: {
         enunciado: "Una estudiante hace todo lo posible por rescatar a un perro atrapado, pero no lo logra. Según Kant, su buena voluntad…",
@@ -286,7 +317,11 @@ window.KANT_CONTENT = {
         { termino: "Inclinación", definicion: "Tendencia o deseo sensible: gusto, afecto, interés, miedo." },
         { termino: "Motivo", definicion: "Lo que mueve a la voluntad a actuar; no se ve desde fuera." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "Prescindo aquí de todas aquellas acciones conocidas ya como contrarias al deber, aunque en este o aquel sentido puedan ser útiles; en efecto, en ellas ni siquiera se plantea la cuestión de si pueden suceder por deber, puesto que ocurren en contra de éste. [...]\n\nPor ejemplo: es, desde luego, conforme al deber que el mercader no cobre más caro a un comprador inexperto; y en los sitios donde hay mucho comercio, el comerciante avisado y prudente no lo hace, en efecto, sino que mantiene un precio fijo para todos en general, de suerte que un niño puede comprar en su casa tan bien como otro cualquiera. Así, pues, uno es servido honradamente. Mas esto no es ni mucho menos suficiente para creer que el mercader haya obrado así por deber, por principios de honradez: su provecho lo exigía; mas no es posible admitir además que el comerciante tenga una inclinación inmediata hacia los compradores, de suerte que por amor a ellos, por decirlo así, no haga diferencias a ninguno en el precio. Así, pues, la acción no ha sucedido ni por deber ni por inclinación inmediata, sino simplemente con una intención egoísta.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 397"
+      },
       trabajoFragmento: "En el fragmento, ¿qué hace el comerciante y cuál es su verdadero motivo? Subrayen la frase que lo revela.",
       pregunta: {
         enunciado: "Dos cajeros devuelven exactamente el vuelto correcto. ¿Qué no podemos saber solo mirándolos?",
@@ -315,7 +350,11 @@ window.KANT_CONTENT = {
         { termino: "Valor moral", definicion: "El que tiene una acción cuando se hace por deber." },
         { termino: "Máxima con contenido moral", definicion: "Principio de acción cuyo motivo es el deber." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "Ser benéfico en cuanto se puede es un deber; pero, además, hay muchas almas tan llenas de conmiseración, que encuentran un placer íntimo en distribuir la alegría en torno suyo, sin que a ello les impulse ningún movimiento de vanidad o de provecho propio, y que pueden regocijarse del contento de los demás, en cuanto que es su obra. Pero yo sostengo que, en tal caso, semejantes actos, por muy conformes que sean al deber, por muy dignos de amor que sean, no tienen, sin embargo, un valor moral verdadero y corren parejas con otras inclinaciones; por ejemplo, con el afán de honras, el cual, cuando, por fortuna, se refiere a cosas que son en realidad de general provecho, conformes al deber y, por tanto, honrosas, merece alabanzas y estímulos, pero no estimación; pues le falta a la máxima contenido moral, esto es, que las tales acciones sean hechas, no por inclinación, sino por deber.\n\nPero supongamos que el ánimo de ese filántropo está envuelto en las nubes de un propio dolor, que apaga en él toda conmiseración por la suerte del prójimo; supongamos, además, que le queda todavía con qué hacer el bien a otros miserables, aunque la miseria ajena no lo conmueve, porque le basta la suya para ocuparle; si entonces, cuando ninguna inclinación le empuja a ello, sabe desasirse de esa mortal insensibilidad y realiza la acción benéfica sin inclinación alguna, sólo por deber, entonces, y sólo entonces, posee esta acción su verdadero valor moral.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 398"
+      },
       trabajoFragmento: "Comparen en el fragmento al filántropo compasivo con el filántropo que sufre. ¿Qué cambia entre ambos y qué permanece igual?",
       pregunta: {
         enunciado: "¿Qué opina Kant de quien ayuda porque disfruta ayudando?",
@@ -345,7 +384,11 @@ window.KANT_CONTENT = {
         { termino: "Principio formal", definicion: "Principio a priori, que no depende de un objeto deseado." },
         { termino: "Móvil material", definicion: "El objeto o resultado deseado que podría impulsar la acción." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "La segunda proposición es ésta: una acción hecha por deber tiene su valor moral, no en el propósito que por medio de ella se quiere alcanzar, sino en la máxima por la cual ha sido resuelta; no depende, pues, de la realidad del objeto de la acción, sino meramente del principio del querer, según el cual ha sucedido la acción, prescindiendo de todos los objetos de la facultad del desear.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 399–400"
+      },
       trabajoFragmento: "Busquen en el fragmento dónde dice Kant que está el valor moral y dónde dice que NO está.",
       pregunta: {
         enunciado: "¿Cuál de estas frases es una máxima?",
@@ -373,7 +416,11 @@ window.KANT_CONTENT = {
         { termino: "Máxima", definicion: "Principio subjetivo del querer." },
         { termino: "Ley práctica", definicion: "Principio objetivo, válido para todo ser racional." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "La tercera proposición, consecuencia de las dos anteriores, la formularía yo de esta manera: el deber es la necesidad de una acción por respeto a la ley. Por el objeto, como efecto de la acción que me propongo realizar, puedo, sí, tener inclinación, mas nunca respeto, justamente porque es un efecto y no una actividad de una voluntad. [...]\n\nUna acción realizada por deber tiene, empero, que excluir por completo el influjo de la inclinación, y con ésta todo objeto de la voluntad; no queda, pues, otra cosa que pueda determinar la voluntad, si no es, objetivamente, la ley y, subjetivamente, el respeto puro a esa ley práctica, y, por tanto, la máxima de obedecer siempre a esa ley, aun con perjuicio de todas mis inclinaciones.\n\n[Nota de Kant:] Máxima es el principio subjetivo del querer; el principio objetivo —esto es, el que serviría de principio práctico, aun subjetivamente, a todos los seres racionales, si la razón tuviera pleno dominio sobre la facultad de desear— es la ley práctica.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 400–401"
+      },
       trabajoFragmento: "Encuentren en el fragmento la definición del deber y, si su edición incluye la nota, la distinción entre máxima y ley práctica.",
       pregunta: {
         enunciado: "Según la explicación, ¿hacia qué puede dirigirse el respeto en sentido kantiano?",
@@ -401,7 +448,11 @@ window.KANT_CONTENT = {
         { termino: "Veracidad por deber", definicion: "Decir la verdad porque es el deber, no por miedo a las consecuencias." },
         { termino: "Promesa falsa", definicion: "Promesa hecha con la intención de no cumplirla." }
       ],
-      fragmento: { texto: "", edicion: "", pagina: "" },
+      fragmento: {
+        texto: "Sea, por ejemplo, la pregunta siguiente: ¿me es lícito, cuando me hallo apurado, hacer una promesa con el propósito de no cumplirla? Fácilmente hago aquí la diferencia que puede comportar la significación de la pregunta: de si es prudente o de si es conforme al deber hacer una falsa promesa. [...]\n\nAhora bien; es cosa muy distinta ser veraz por deber [...] por temor a las consecuencias perjudiciales; porque, en el primer caso, el concepto de la acción en sí mismo contiene ya una ley para mí, y en el segundo, tengo que empezar por observar alrededor cuáles efectos para mí puedan derivarse de la acción. Si me aparto del principio del deber, de seguro es ello malo; pero si soy infiel a mi máxima de la sagacidad, puede ello a veces serme provechoso, aun cuando desde luego es más seguro permanecer adicto a ella.",
+        edicion: "Trad. de Manuel García Morente (Madrid, Calpe, 1921; dominio público)",
+        pagina: "Ak. IV 402–403"
+      },
       trabajoFragmento: "Identifiquen en el fragmento las dos maneras de entender la pregunta sobre la promesa. ¿Qué palabra usa su edición para cada una?",
       pregunta: {
         enunciado: "\"No voy a mentirle a mi profesor, porque si me pilla me va peor\". Este razonamiento es…",
