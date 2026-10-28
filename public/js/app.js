@@ -387,6 +387,65 @@
       "</section>";
   }
 
+  /* ------------------------------------------------------------------
+     Fragmentos del docente compartidos por ARCHIVO (no se publican)
+     El docente descarga un .json desde el panel y lo comparte por un
+     canal cerrado (Classroom, correo, pendrive). Cada pareja lo carga
+     en su navegador. El texto nunca queda en GitHub ni en el sitio.
+     ------------------------------------------------------------------ */
+  var FRAG_FILE_TYPE = "kant-enigma-fragmentos";
+  function fragCount() {
+    return C.lecturas.filter(function (r) { var f = getFragment(r); return f.texto && f.texto.trim(); }).length;
+  }
+  function fragFileInput(id) {
+    return '<input type="file" id="' + id + '" class="sr-only frag-file" accept=".json,application/json">' +
+      '<label class="btn file-btn" for="' + id + '">📂 Cargar archivo de fragmentos</label>';
+  }
+  function fragCardHtml() {
+    var n = fragCount();
+    return '<section class="card" aria-labelledby="fc-h"><h2 id="fc-h">Fragmentos de Kant</h2>' +
+      "<p>Si su profesor o profesora les compartió un <strong>archivo de fragmentos</strong> (termina en <code>.json</code>), cárguenlo aquí. Solo se hace una vez en este equipo.</p>" +
+      '<p class="muted small" id="frag-status">Fragmentos cargados en este equipo: ' + n + " de " + C.lecturas.length + ".</p>" +
+      '<div class="actions">' + fragFileInput("frag-file-start") + "</div></section>";
+  }
+  function importFragmentsFile(file) {
+    if (!file) return;
+    if (file.size > 500000) { showToast("El archivo es demasiado grande para ser un archivo de fragmentos."); return; }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var data;
+      try { data = JSON.parse(String(reader.result)); } catch (e) { showToast("No se pudo leer el archivo: no es un archivo de fragmentos válido."); return; }
+      if (!data || data.tipo !== FRAG_FILE_TYPE || typeof data.fragmentos !== "object") { showToast("Este archivo no es un archivo de fragmentos de esta actividad."); return; }
+      var n = 0;
+      C.lecturas.forEach(function (r) {
+        var f = data.fragmentos[r.id];
+        if (f && typeof f.texto === "string" && f.texto.trim()) {
+          fragments[r.id] = {
+            texto: f.texto.slice(0, 6000),
+            edicion: String(f.edicion || "").slice(0, 200),
+            pagina: String(f.pagina || "").slice(0, 100)
+          };
+          n++;
+        }
+      });
+      ST.set(KEYS.frag, fragments);
+      showToast("Fragmentos cargados: " + n + " de " + C.lecturas.length + ".");
+      render();
+    };
+    reader.onerror = function () { showToast("No se pudo leer el archivo."); };
+    reader.readAsText(file, "utf-8");
+  }
+  function exportFragmentsFile() {
+    var out = {};
+    C.lecturas.forEach(function (r) {
+      var tx = $("#fx-" + r.id), ed = $("#fe-" + r.id), pg = $("#fp-" + r.id);
+      var f = tx ? { texto: tx.value, edicion: ed.value.trim(), pagina: pg.value.trim() } : getFragment(r);
+      if (f.texto && f.texto.trim()) out[r.id] = f;
+    });
+    if (!Object.keys(out).length) { showToast("No hay fragmentos para exportar."); return; }
+    download("fragmentos-kant.json", JSON.stringify({ tipo: FRAG_FILE_TYPE, version: 1, creado: new Date().toISOString(), fragmentos: out }, null, 2), "application/json");
+  }
+
   function viewStart() {
     var hero = '<section class="hero"><div class="hero-art" aria-hidden="true">' + svgIcon("manuscrito", 72) + svgIcon("puerta", 72) + svgIcon("sello", 72) + "</div>" +
       "<h1>" + esc(C.titulo) + '<span class="subtitle">' + esc(C.subtitulo) + "</span></h1>" +
@@ -394,7 +453,7 @@
     if (state.started) {
       return hero + '<section class="card"><h2>Partida en curso</h2><p>Equipo: <strong>' + esc(state.names[0]) + "</strong> y <strong>" + esc(state.names[1]) + "</strong> · iniciada el " + esc(state.fecha) + ".</p>" +
         '<div class="actions"><button class="btn primary" data-action="go" data-to="mapa">Continuar la aventura</button>' +
-        '<button class="btn" data-action="new-game">Nueva partida</button></div></section>' + rulesHtml();
+        '<button class="btn" data-action="new-game">Nueva partida</button></div></section>' + fragCardHtml() + rulesHtml();
     }
     return hero +
       '<form class="card" id="start-form" novalidate aria-labelledby="start-h"><h2 id="start-h">Formen su pareja</h2>' +
@@ -403,7 +462,7 @@
       '<p class="form-error" id="start-error" role="alert"></p>' +
       '<label class="check"><input type="checkbox" id="rules-ok" required> Leímos las reglas de puntaje y décimas.</label>' +
       '<div class="actions"><button class="btn primary" type="submit">Entrar a la biblioteca</button></div></form>' +
-      rulesHtml();
+      fragCardHtml() + rulesHtml();
   }
 
   /* ------------------------------------------------------------------
@@ -523,7 +582,8 @@
     var fragHtml = hasFrag
       ? '<blockquote class="kant-quote" lang="es">' + esc(f.texto).replace(/\n{2,}/g, "</p><p>").replace(/^/, "<p>").replace(/$/, "</p>").replace(/\n/g, "<br>") + "</blockquote>" +
         '<p class="ref"><strong>Referencia:</strong> ' + esc(r.ubicacion.seccion) + (f.edicion ? " · " + esc(f.edicion) : "") + (f.pagina ? " · " + esc(f.pagina) : "") + "</p>"
-      : '<div class="frag-pending"><p><strong>FRAGMENTO PENDIENTE — lo agrega el docente.</strong></p><p>Este espacio está reservado para un fragmento de la edición autorizada que use el curso. Mientras tanto, trabajen con la explicación didáctica de arriba: la actividad funciona igual.</p></div>';
+      : '<div class="frag-pending"><p><strong>FRAGMENTO PENDIENTE — lo agrega el docente.</strong></p><p>Este espacio está reservado para un fragmento de la edición autorizada que use el curso. Mientras tanto, trabajen con la explicación didáctica de arriba: la actividad funciona igual.</p>' +
+        '<p>¿Su profesor o profesora les compartió un archivo de fragmentos? Cárguenlo aquí:</p><div class="actions">' + fragFileInput("frag-file-reading") + "</div></div>";
     var pq = r.pregunta;
     var order = shuffleIdx(pq.opciones.length, "pre-" + rid);
     var prev = state.pre[rid];
@@ -1109,7 +1169,7 @@
       "<h3>Duración y organización</h3><p>Aproximadamente <strong>90 minutos</strong>, en parejas, con un computador, tableta o teléfono por pareja. Sugerencia: 5 min de presentación de reglas · 20 min Zona 1 · 30 min Zona 2 · 20 min Zona 3 · 10 min Puerta final y comprobación individual · 5 min cierre con el informe.</p>" +
       "<h3>Objetivos de aprendizaje</h3><ul><li>Comprender por qué Kant busca una filosofía moral pura (a priori) y distinguir regla práctica de ley moral.</li><li>Explicar por qué la buena voluntad es lo único bueno sin restricción y por qué su valor no depende de los resultados.</li><li>Distinguir acciones contrarias al deber, conformes al deber y hechas por deber, identificando motivos.</li><li>Explicar la segunda y la tercera proposición (máxima, respeto, ley práctica) y la diferencia entre prudencia y deber.</li></ul>" +
       "<h3>Contenidos</h3><p>Solo el Prefacio y la Primera sección de la <em>Fundamentación de la metafísica de las costumbres</em>. No se adelanta la Segunda sección ni se trata el imperativo categórico como tema central (se menciona solo como anticipo en la Lectura 10). Se evitó deliberadamente el ejemplo de conservar la propia vida.</p>" +
-      "<h3>Fragmentos de Kant</h3><p>La app <strong>no incluye citas</strong>: todo el texto es explicación original. En la pestaña <em>Fragmentos de lectura</em> puede pegar, para cada lectura, un fragmento de la edición autorizada que use el curso, con su edición y página. Se guarda en este navegador. Para que valga en todos los equipos, cópielo en <code>public/js/content.js</code> y vuelva a desplegar.</p>" +
+      "<h3>Fragmentos de Kant</h3><p>La app <strong>no incluye citas</strong>: todo el texto es explicación original. En la pestaña <em>Fragmentos de lectura</em> puede pegar, para cada lectura, un fragmento de la edición autorizada que use el curso, con su edición y página. Se guarda en este navegador. Para que lo lean los estudiantes <strong>sin publicar el texto en internet</strong>, use «Descargar archivo de fragmentos» y compártalo por un canal cerrado del curso; cada pareja lo carga en su equipo. Solo si el texto es de dominio público (p. ej., García Morente, 1921) puede copiarlo en <code>public/js/content.js</code>, porque ese archivo queda publicado.</p>" +
       "<h3>Reglas de puntaje y décimas</h3><ul><li>PE por desafío: " + cfg.attemptMultipliers.map(function (x, i) { return (i + 1) + ".er/º intento " + Math.round(x * 100) + " %"; }).join(" · ") + ". Pista: −" + Math.round(cfg.hintPenalty * 100) + " % del valor. Máximo " + cfg.maxAttempts + " intentos; luego, solución con 0 PE.</li>" +
       "<li>Porcentaje = PE obtenidos ÷ PE máximos de los desafíos activos (actualmente " + nCh + " desafíos). La XP no participa.</li>" +
       "<li>Las respuestas abiertas suman un puntaje provisorio (autoevaluación) hasta que usted lo valida en el informe; al validar, el porcentaje y las décimas se recalculan.</li>" +
@@ -1168,7 +1228,12 @@
         '<div class="field"><label for="fp-' + r.id + '">Página o referencia</label><input id="fp-' + r.id + '" value="' + esc(f.pagina || "") + '"></div></div></fieldset>';
     }).join("");
     return "<h2>Fragmentos de lectura</h2><p>Pegue aquí, para cada lectura, el fragmento de la edición autorizada del curso. Aparecerá en el panel «Lectura de referencia», separado visualmente de las explicaciones didácticas. Respete los derechos de autor de la edición que utilice y cite edición y página.</p>" +
-      '<form id="frag-form">' + items + '<div class="actions sticky-actions"><button class="btn primary" type="submit">Guardar fragmentos en este navegador</button><button type="button" class="btn" data-action="export-frag">Copiar como código para content.js</button></div></form>' +
+      '<div class="card inset"><h3>Compartir con los estudiantes sin publicar el texto</h3>' +
+      "<ol><li>Pegue y guarde los fragmentos abajo.</li><li>Pulse <strong>«Descargar archivo de fragmentos»</strong>: obtendrá <code>fragmentos-kant.json</code>.</li>" +
+      "<li>Compártalo por un canal cerrado del curso (Classroom, correo, pendrive). <strong>No lo suba a GitHub.</strong></li>" +
+      "<li>Cada pareja lo carga en la pantalla de inicio (o en cualquier lectura) con «Cargar archivo de fragmentos». Queda guardado en ese equipo.</li></ol>" +
+      '<div class="actions"><button type="button" class="btn primary" data-action="export-frag-file">Descargar archivo de fragmentos</button>' + fragFileInput("frag-file-teacher") + "</div></div>" +
+      '<form id="frag-form">' + items + '<div class="actions sticky-actions"><button class="btn primary" type="submit">Guardar fragmentos en este navegador</button><button type="button" class="btn" data-action="export-frag">Copiar como código para content.js (solo textos de dominio público)</button></div></form>' +
       '<div id="frag-export" hidden><label for="frag-code">Código para pegar en content.js (reemplace cada «fragmento: {…}»)</label><textarea id="frag-code" rows="10" readonly></textarea></div>';
   }
 
@@ -1322,6 +1387,7 @@
         render();
         break;
       }
+      case "export-frag-file": exportFragmentsFile(); break;
       case "export-frag": {
         var code = C.lecturas.map(function (r) {
           var f = { texto: ($("#fx-" + r.id) || {}).value || "", edicion: ($("#fe-" + r.id) || {}).value || "", pagina: ($("#fp-" + r.id) || {}).value || "" };
@@ -1400,6 +1466,13 @@
       }
       default:
         if (f.classList.contains("validate-form")) saveValidation(f);
+    }
+  });
+
+  document.addEventListener("change", function (e) {
+    if (e.target.classList && e.target.classList.contains("frag-file")) {
+      importFragmentsFile(e.target.files && e.target.files[0]);
+      e.target.value = "";
     }
   });
 
