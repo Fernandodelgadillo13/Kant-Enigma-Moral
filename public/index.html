@@ -8,9 +8,12 @@
   <meta name="theme-color" content="#0b1430">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23d9b45a'/%3E%3Cpath d='M32 14l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z' fill='%230b1430'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/styles.css">
+  <!-- Tema de Halloween (se activa solo entre el 15 de octubre y el 2 de noviembre, o con el botón 🎃). Para quitarlo, borre esta línea. -->
+  <link rel="stylesheet" href="css/halloween.css">
 </head>
 <body>
   <a class="skip" href="#app">Saltar al contenido</a>
+  <div id="decor" aria-hidden="true"></div>
 
   <header class="topbar no-print">
     <div class="brand">
@@ -24,6 +27,7 @@
       <button class="btn small" data-action="font-down" aria-label="Reducir tamaño de letra">A−</button>
       <button class="btn small" data-action="font-up" aria-label="Aumentar tamaño de letra">A+</button>
       <button class="btn small" id="btn-light" data-action="toggle-light" aria-pressed="false">Fondo claro</button>
+      <button class="btn small" id="btn-theme" data-action="toggle-theme" aria-pressed="false" aria-label="Tema de Halloween">🎃</button>
       <button class="btn small teacher-btn" data-action="go" data-to="docente">Panel docente</button>
     </nav>
   </header>
