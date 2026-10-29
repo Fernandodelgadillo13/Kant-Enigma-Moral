@@ -107,6 +107,18 @@
   var cfg = loadConfig();
   var fragments = ST.get(KEYS.frag, {});
   var prefs = ST.get(KEYS.prefs, { scale: 1, light: false });
+
+  /* Tema de Halloween: automático entre el 15 de octubre y el 2 de
+     noviembre; el botón 🎃 lo enciende o apaga en este navegador. */
+  function inHalloweenWindow(d) {
+    var m = d.getMonth() + 1, day = d.getDate();
+    return (m === 10 && day >= 15) || (m === 11 && day <= 2);
+  }
+  function isHalloween() {
+    if (prefs.theme === "halloween") return true;
+    if (prefs.theme === "clasico") return false;
+    return inHalloweenWindow(new Date());
+  }
   var state = loadGame();
   var teacherUnlocked = false;
   var orderDraft = {};      // orden provisional de los desafíos "ordenar"
@@ -308,6 +320,7 @@
     var z = zoneById[a.zona];
     var ov = document.getElementById("overlay");
     ov.innerHTML = '<div class="overlay-card" role="dialog" aria-modal="true" aria-labelledby="ov-title">' +
+      (isHalloween() ? '<div class="hw-ghost-pop" aria-hidden="true" style="color:#f4ecff">' + HW_GHOST + "</div>" : "") +
       '<div class="stamp">' + svgSeal(120) + "</div>" +
       '<h2 id="ov-title">¡' + esc(z.sello) + "!</h2>" +
       "<p>Completaron la zona «" + esc(z.nombre) + "».</p>" +
@@ -335,6 +348,9 @@
   }
   function svgIcon(name, size) {
     size = size || 56;
+    if (isHalloween() && HW_ICONS[name]) {
+      return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false" class="icon">' + HW_ICONS[name] + "</svg>";
+    }
     var open = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false" class="icon">';
     var p = {
       manuscrito: '<rect x="14" y="10" width="36" height="44" rx="3" fill="#f3e6c4" stroke="#d9b45a" stroke-width="2"/><path d="M20 20h24M20 27h24M20 34h18M20 41h22" stroke="#7a5b2a" stroke-width="2" stroke-linecap="round"/><path d="M44 46l10-18 3 2-10 18z" fill="#3fd0c9"/><circle cx="12" cy="12" r="5" fill="#d9b45a"/><circle cx="52" cy="52" r="5" fill="#d9b45a"/>',
@@ -345,6 +361,43 @@
     };
     return open + (p[name] || p.sello) + "</svg>";
   }
+  var HW_ICONS = {
+    /* grimorio con un ojo que parpadea */
+    manuscrito: '<rect x="12" y="10" width="40" height="46" rx="4" fill="#3b2357" stroke="#ff8a2a" stroke-width="2.5"/><rect x="16" y="10" width="4" height="46" fill="#2a1a44"/>' +
+      '<ellipse cx="34" cy="31" rx="11" ry="7" fill="#f4ecdf"/><g class="hw-eyes"><circle cx="34" cy="31" r="4" fill="#9dff6a"/><circle cx="34" cy="31" r="1.8" fill="#120a1f"/></g>' +
+      '<path d="M24 46h20M26 50h16" stroke="#ff8a2a" stroke-width="2" stroke-linecap="round"/>',
+    /* caldero burbujeante */
+    matraz: '<ellipse cx="32" cy="22" rx="20" ry="5" fill="#9dff6a" opacity=".9"/><path d="M12 22c0 18 8 30 20 30s20-12 20-30" fill="#22172f" stroke="#ff8a2a" stroke-width="2.5"/>' +
+      '<path d="M18 52l-4 6M46 52l4 6" stroke="#ff8a2a" stroke-width="3" stroke-linecap="round"/>' +
+      '<circle class="hw-bubble" cx="26" cy="18" r="3" fill="#9dff6a"/><circle class="hw-bubble b2" cx="36" cy="16" r="2.2" fill="#c8ff9e"/><circle class="hw-bubble b3" cx="31" cy="19" r="1.8" fill="#9dff6a"/>',
+    /* puerta de cripta con calavera */
+    puerta: '<path d="M12 58V26a20 20 0 0140 0v32z" fill="#2a1a44" stroke="#ff8a2a" stroke-width="2.5"/><path d="M32 8v50" stroke="#ff8a2a" stroke-width="1.2" opacity=".5"/>' +
+      '<circle cx="32" cy="30" r="7" fill="#f4ecdf"/><circle cx="29.5" cy="29" r="1.8" fill="#120a1f"/><circle cx="34.5" cy="29" r="1.8" fill="#120a1f"/><rect x="29" y="34" width="6" height="3" rx="1" fill="#f4ecdf"/>' +
+      '<path d="M6 58h52" stroke="#ff8a2a" stroke-width="3" stroke-linecap="round"/>',
+    /* calabaza (jack-o-lantern) */
+    sello: '<path d="M32 14c2-6 7-8 10-7-4 2-6 5-6 8" fill="#3d7a1c"/><ellipse cx="22" cy="36" rx="12" ry="17" fill="#e2640b"/><ellipse cx="42" cy="36" rx="12" ry="17" fill="#e2640b"/><ellipse cx="32" cy="36" rx="13" ry="19" fill="#ff8a2a"/>' +
+      '<g class="hw-flame"><path d="M22 31l5-6 5 6zM32 31l5-6 5 6z" fill="#ffe36b"/><path d="M20 42c4 5 20 5 24 0l-3 1-2-3-3 3-3-3-3 3-2-3-3 3z" fill="#ffe36b"/></g>'
+  };
+  var HW_BAT = '<svg viewBox="0 0 64 32" aria-hidden="true" focusable="false"><g class="wing"><path d="M32 18C24 6 12 6 2 10c6 2 8 6 8 10 4-4 10-4 14 0 2-4 6-4 8-2z" fill="currentColor"/><path d="M32 18c8-12 20-12 30-8-6 2-8 6-8 10-4-4-10-4-14 0-2-4-6-4-8-2z" fill="currentColor"/></g><ellipse cx="32" cy="18" rx="4" ry="6" fill="currentColor"/><path d="M29 12l1-4 2 3 2-3 1 4z" fill="currentColor"/></svg>';
+  var HW_GHOST = '<svg viewBox="0 0 64 80" aria-hidden="true" focusable="false"><path d="M32 4C16 4 8 18 8 34v40l8-6 8 6 8-6 8 6 8-6 8 6V34C56 18 48 4 32 4z" fill="currentColor"/><ellipse cx="24" cy="32" rx="4" ry="6" fill="#120a1f"/><ellipse cx="40" cy="32" rx="4" ry="6" fill="#120a1f"/><ellipse cx="32" cy="48" rx="5" ry="4" fill="#120a1f"/></svg>';
+  var HW_SPIDER = '<svg viewBox="0 0 40 34" aria-hidden="true" focusable="false"><g stroke="#05020a" stroke-width="2" fill="none" stroke-linecap="round"><path d="M14 14L4 6M14 17L2 16M14 20L4 28M26 14l10-8M26 17l12-1M26 20l10 8"/></g><ellipse cx="20" cy="18" rx="8" ry="9" fill="#05020a"/><circle cx="17" cy="15" r="1.6" fill="#ff3b3b"/><circle cx="23" cy="15" r="1.6" fill="#ff3b3b"/></svg>';
+  var HW_WEB = '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L100 100M0 0L100 40M0 0L40 100M0 0L100 0M0 0L0 100"/><path d="M0 20Q14 14 20 0M0 40Q28 28 40 0M0 62Q44 44 62 0M0 84Q60 60 84 0"/></g></svg>';
+  var HW_PUMPKIN = '<svg viewBox="0 0 64 56" aria-hidden="true" focusable="false"><path d="M32 8c2-5 7-7 10-6-4 2-6 4-6 7" fill="#3d7a1c"/><ellipse cx="22" cy="32" rx="12" ry="16" fill="#e2640b"/><ellipse cx="42" cy="32" rx="12" ry="16" fill="#e2640b"/><ellipse cx="32" cy="32" rx="13" ry="18" fill="#ff8a2a"/><g class="glow"><path d="M22 28l5-6 5 6zM32 28l5-6 5 6z" fill="#ffe36b"/><path d="M20 38c4 5 20 5 24 0l-3 1-2-3-3 3-3-3-3 3-2-3-3 3z" fill="#ffe36b"/></g></svg>';
+
+  function buildDecor() {
+    var d = document.getElementById("decor");
+    if (!d) return;
+    if (!isHalloween()) { d.innerHTML = ""; return; }
+    if (d.childElementCount) return;
+    d.innerHTML = '<div class="hw-moon"></div>' +
+      '<div class="hw-web tl">' + HW_WEB + "</div><div class=\"hw-web br\">" + HW_WEB + "</div>" +
+      '<div class="hw-bat b1">' + HW_BAT + '</div><div class="hw-bat b2">' + HW_BAT + '</div><div class="hw-bat b3">' + HW_BAT + '</div><div class="hw-bat b4">' + HW_BAT + "</div>" +
+      '<div class="hw-spider"><div class="thread"></div>' + HW_SPIDER + "</div>" +
+      '<div class="hw-ghost">' + HW_GHOST + "</div>" +
+      '<div class="hw-fog"></div><div class="hw-fog f2"></div>' +
+      '<div class="hw-pumpkins">' + HW_PUMPKIN + HW_PUMPKIN + "</div>";
+  }
+
   function svgMapBackground() {
     var stars = "";
     var r = rng(42);
@@ -352,11 +405,16 @@
       stars += '<circle cx="' + Math.round(r() * 1000) + '" cy="' + Math.round(r() * 560) + '" r="' + (r() * 1.6 + 0.4).toFixed(1) + '" fill="#f6e7b0" opacity="' + (r() * 0.6 + 0.2).toFixed(2) + '"/>';
     }
     return '<svg class="map-bg" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
-      '<defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#d9b45a"/><stop offset="1" stop-color="#3fd0c9"/></linearGradient></defs>' +
+      '<defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="' + (isHalloween() ? "#ff8a2a" : "#d9b45a") + '"/><stop offset="1" stop-color="' + (isHalloween() ? "#9dff6a" : "#3fd0c9") + '"/></linearGradient></defs>' +
       stars +
       '<path d="M120 440 C 260 420, 220 260, 360 250 S 560 380, 640 260 S 820 100, 880 120" fill="none" stroke="url(#g1)" stroke-width="6" stroke-dasharray="14 12" stroke-linecap="round" opacity=".75"/>' +
       '<path d="M40 520 Q 200 470 340 520 T 640 520 T 960 510" fill="none" stroke="#a98bff" stroke-width="2" opacity=".35"/>' +
-      '<g opacity=".18" fill="#f3e6c4"><rect x="40" y="40" width="10" height="70"/><rect x="54" y="30" width="10" height="80"/><rect x="68" y="50" width="10" height="60"/><rect x="930" y="380" width="10" height="70"/><rect x="944" y="395" width="10" height="55"/></g>' +
+      (isHalloween()
+        ? '<circle cx="600" cy="80" r="36" fill="#ffd98a" opacity=".5"/><circle cx="588" cy="72" r="7" fill="#e0b060" opacity=".6"/>' +
+          '<g fill="#0b0614" opacity=".85"><path d="M30 560v-60a22 22 0 0144 0v60z"/><path d="M90 560v-44a16 16 0 0132 0v44z"/><rect x="150" y="510" width="8" height="50"/><rect x="138" y="522" width="32" height="8"/>' +
+          '<path d="M880 560v-56a20 20 0 0140 0v56z"/><path d="M940 560v-40a14 14 0 0128 0v40z"/><path d="M0 560h1000v-14c-120-12-260 8-400-2s-300 10-600 0z"/></g>' +
+          '<g fill="#f4ecdf" opacity=".5" font-size="12" font-family="Georgia,serif"><text x="41" y="530">R.I.P.</text></g>'
+        : '<g opacity=".18" fill="#f3e6c4"><rect x="40" y="40" width="10" height="70"/><rect x="54" y="30" width="10" height="80"/><rect x="68" y="50" width="10" height="60"/><rect x="930" y="380" width="10" height="70"/><rect x="944" y="395" width="10" height="55"/></g>') +
       "</svg>";
   }
 
@@ -449,6 +507,7 @@
   function viewStart() {
     var hero = '<section class="hero"><div class="hero-art" aria-hidden="true">' + svgIcon("manuscrito", 72) + svgIcon("puerta", 72) + svgIcon("sello", 72) + "</div>" +
       "<h1>" + esc(C.titulo) + '<span class="subtitle">' + esc(C.subtitulo) + "</span></h1>" +
+      '<p class="hw-badge">🎃 Edición noche de brujas: la biblioteca abre a medianoche</p>' +
       '<p class="lead">Una misteriosa biblioteca guarda la respuesta a una pregunta antigua: <em>¿qué hace que una acción sea moralmente buena?</em> Para abrir la Puerta del juicio final deberán reunir tres sellos, leyendo y razonando como Immanuel Kant en el Prefacio y la Primera sección de la <em>Fundamentación de la metafísica de las costumbres</em>.</p></section>';
     if (state.started) {
       return hero + '<section class="card"><h2>Partida en curso</h2><p>Equipo: <strong>' + esc(state.names[0]) + "</strong> y <strong>" + esc(state.names[1]) + "</strong> · iniciada el " + esc(state.fecha) + ".</p>" +
@@ -1347,6 +1406,11 @@
       case "font-down": prefs.scale = Math.max(0.85, Math.round((prefs.scale - 0.1) * 100) / 100); applyPrefs(); break;
       case "font-up": prefs.scale = Math.min(1.5, Math.round((prefs.scale + 0.1) * 100) / 100); applyPrefs(); break;
       case "toggle-light": prefs.light = !prefs.light; applyPrefs(); break;
+      case "toggle-theme":
+        prefs.theme = isHalloween() ? "clasico" : "halloween";
+        applyPrefs(); render();
+        announce(isHalloween() ? "Tema de Halloween activado" : "Tema clásico activado");
+        break;
       case "close-notice": ST.set(KEYS.notice, true); document.getElementById("storage-notice").hidden = true; break;
       case "ind-start": state.individual.started[Number(btn.getAttribute("data-m"))] = true; save(); render(); break;
       case "print": window.print(); break;
@@ -1487,6 +1551,10 @@
   function applyPrefs() {
     document.documentElement.style.setProperty("--scale", prefs.scale);
     document.body.classList.toggle("light", !!prefs.light);
+    document.body.classList.toggle("theme-halloween", isHalloween());
+    buildDecor();
+    var tb = document.getElementById("btn-theme");
+    if (tb) { tb.setAttribute("aria-pressed", String(isHalloween())); tb.title = isHalloween() ? "Desactivar tema de Halloween" : "Activar tema de Halloween"; }
     var lb = document.getElementById("btn-light");
     if (lb) { lb.setAttribute("aria-pressed", String(!!prefs.light)); lb.textContent = prefs.light ? "Fondo oscuro" : "Fondo claro"; }
     ST.set(KEYS.prefs, prefs);
