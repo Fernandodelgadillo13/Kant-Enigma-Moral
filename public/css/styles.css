@@ -357,3 +357,5 @@ body.light .tab.on { background: #b23a4c; color: #fff; }
 .send-status { min-height: 1.2em; }
 .send-status.ok { color: var(--ok); }
 .send-status.bad { color: var(--bad); }
+.school-fixed { padding: .5rem .8rem; border: 1px dashed var(--line); border-radius: 8px; }
+.link-code { word-break: break-all; font-size: .85rem; }
