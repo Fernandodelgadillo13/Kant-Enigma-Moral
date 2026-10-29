@@ -1128,7 +1128,14 @@
     }).join("");
     var recs = recommendations(t).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
 
-    return '<div class="report-actions no-print actions"><button class="btn primary" data-action="print">Imprimir informe</button>' +
+    var sendBox = informeUrl()
+      ? '<div class="card send-card no-print"><h2>Enviar al profesor</h2><p>Envía su informe (nombres, puntajes, resultados y respuestas abiertas) a la planilla del docente.' +
+        (t.provisional ? " Hay respuestas abiertas sin validar: pueden enviarlo ahora y volver a enviarlo después de la validación (se actualiza la misma fila)." : "") +
+        (cfg.individualCheckEnabled && !(indDone(0) && indDone(1)) ? " <strong>Aún falta la comprobación individual.</strong>" : "") +
+        '</p><div class="actions"><button class="btn primary" data-action="send-report">📨 Enviar informe al profesor</button></div>' +
+        '<p id="send-status" class="send-status" role="status" aria-live="polite">' + (state.sentAt ? "Último envío: " + esc(state.sentAt) + "." : "") + "</p></div>"
+      : "";
+    return sendBox + '<div class="report-actions no-print actions"><button class="btn primary" data-action="print">Imprimir informe</button>' +
       '<button class="btn" data-action="download">Descargar informe (HTML)</button>' +
       '<button class="btn" data-action="download-json">Descargar datos (JSON)</button>' +
       (teacherUnlocked ? "" : '<button class="btn ghost" data-action="go" data-to="docente">Validar como docente</button>') +
@@ -1151,8 +1158,93 @@
       '<section aria-labelledby="o-h"><h2 id="o-h">Respuestas abiertas</h2>' + (openHtml || "<p>No hay respuestas abiertas activas.</p>") + "</section>" +
       '<section aria-labelledby="r-h"><h2 id="r-h">Recomendaciones de repaso</h2><ul>' + recs + "</ul></section>" +
       '<details class="detail"><summary>Detalle por desafío</summary><table class="table small"><thead><tr><th scope="col">Id</th><th scope="col">Desafío</th><th scope="col">Estado</th><th scope="col">Errores</th><th scope="col">Pista</th><th scope="col">PE</th></tr></thead><tbody>' + detailRows + "</tbody></table></details>" +
-      '<p class="muted small">Tabla de décimas aplicada: ' + cfg.tramos.map(function (x) { return "desde " + x.desde + " % → " + x.decimas; }).join(" · ") + ". Este informe se generó en el navegador; la aplicación no lo envía a ningún servidor.</p>" +
+      '<p class="muted small">Tabla de décimas aplicada: ' + cfg.tramos.map(function (x) { return "desde " + x.desde + " % → " + x.decimas; }).join(" · ") + ". " + (informeUrl() ? "Este informe solo se envía a la planilla del docente cuando la pareja pulsa «Enviar informe al profesor»." : "Este informe se generó en el navegador; la aplicación no lo envía a ningún servidor.") + "</p>" +
       "</article>";
+  }
+
+  /* ------------------------------------------------------------------
+     ENVÍO DEL INFORME A LA PLANILLA DEL DOCENTE (Google Apps Script)
+     Solo si config.js tiene informeUrl. Se envía: nombres, fecha,
+     puntajes, resultados y respuestas abiertas. Reenviar actualiza la
+     misma fila (se reconoce por el ID de la partida).
+     ------------------------------------------------------------------ */
+  function informeUrl() { return String(cfg.informeUrl || BASE.informeUrl || "").trim(); }
+  function reportId() {
+    if (!state.id) { state.id = "P-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7); save(); }
+    return state.id;
+  }
+  function buildReportRow() {
+    var t = S.computeTotals(state, C, cfg);
+    var pct = function (x) { return Math.round(x * 10) / 10; };
+    var row = {
+      "ID": reportId(), "Fecha": state.fecha || today(),
+      "Integrante 1": state.names[0] || "", "Integrante 2": state.names[1] || "",
+      "Porcentaje": pct(t.pct), "PE": t.pe, "PE máximo": t.peMax, "Décimas": t.decimas,
+      "Provisorio": t.provisional ? "Sí (falta validar respuestas abiertas)" : "No",
+      "Completados": t.completed + " de " + t.total, "Aciertos": t.correct, "Al primer intento": t.firstTry,
+      "Errores": t.wrongAttempts, "Pistas": t.hints, "Soluciones vistas": t.failed,
+      "Tabla de décimas": cfg.tramos.map(function (x) { return x.desde + "%→" + x.decimas; }).join(" · ") + " (máx. " + cfg.maxDecimas + ")",
+      "Recomendaciones": recommendations(t).join(" | ")
+    };
+    ["z1", "z2", "z3", "z4"].forEach(function (z, i) {
+      var zr = t.byZone[z];
+      row["Zona " + (i + 1) + " %"] = zr.active ? pct(zr.pct) : "desactivada";
+    });
+    [0, 1].forEach(function (m) {
+      var qs = indQuestions(m);
+      var ans = qs.filter(function (q) { return state.individual.answers[q.id] !== undefined; });
+      var ok = ans.filter(function (q) { return state.individual.answers[q.id].ok; }).length;
+      row["Individual integrante " + (m + 1)] = !cfg.individualCheckEnabled ? "desactivada" : ans.length ? ok + " de " + qs.length + (ans.length < qs.length ? " (incompleta)" : "") : "sin responder";
+    });
+    ["c18", "c29", "c34"].forEach(function (cid) {
+      var ch = challengeById[cid], r = rec(cid);
+      if (!ch || !isActive(ch)) { row[cid + " respuesta"] = "desactivada"; row[cid + " puntaje"] = ""; return; }
+      row[cid + " respuesta"] = r && r.text ? r.text : "sin respuesta";
+      row[cid + " puntaje"] = r && r.text ? fmtNum(S.rubricPoints(ch.valor, r.teacher || r.self)) + " de " + ch.valor + (r.teacher ? " (validado)" : " (autoevaluación)") : "";
+    });
+    return row;
+  }
+  function sendReport(fila, onDone) {
+    var url = informeUrl();
+    if (!url) { onDone(false, "No hay una planilla configurada."); return; }
+    var body = JSON.stringify({ tipo: "kant-enigma-informe", version: 1, fila: fila });
+    var finished = false;
+    var timer = setTimeout(function () { if (!finished) { finished = true; onDone(false, "La planilla no respondió a tiempo."); } }, 25000);
+    function end(ok, msg) { if (finished) return; finished = true; clearTimeout(timer); onDone(ok, msg); }
+    try {
+      fetch(url, { method: "POST", body: body, redirect: "follow" })
+        .then(function (r) { return r.text().then(function (tx) { return { status: r.status, tx: tx }; }); })
+        .then(function (res) {
+          var data = null;
+          try { data = JSON.parse(res.tx); } catch (e) { /* respuesta no JSON */ }
+          if (data && data.ok) end(true, data.actualizado ? "actualizado" : "nuevo");
+          else end(false, (data && data.error) ? data.error : "Respuesta inesperada (" + res.status + ").");
+        })
+        .catch(function () {
+          // Algunos navegadores bloquean leer la respuesta: se reintenta sin confirmación.
+          fetch(url, { method: "POST", body: body, mode: "no-cors" })
+            .then(function () { end(true, "sin-confirmacion"); })
+            .catch(function () { end(false, "No hay conexión con la planilla."); });
+        });
+    } catch (e) { end(false, "Este navegador no permitió el envío."); }
+  }
+  function sendReportFromUI(btn) {
+    var out = $("#send-status");
+    btn.disabled = true;
+    out.textContent = "Enviando…";
+    sendReport(buildReportRow(), function (ok, info) {
+      btn.disabled = false;
+      if (ok) {
+        state.sentAt = new Date().toLocaleString("es-CL"); save();
+        out.innerHTML = info === "sin-confirmacion"
+          ? "Informe enviado el " + esc(state.sentAt) + ". (El navegador no pudo confirmar la recepción: por seguridad, descarguen también el informe.)"
+          : "✓ Informe " + (info === "actualizado" ? "actualizado" : "enviado") + " el " + esc(state.sentAt) + ". Si el docente valida sus respuestas abiertas, vuelvan a enviarlo: se actualiza la misma fila.";
+        out.className = "send-status ok";
+      } else {
+        out.innerHTML = "No se pudo enviar: " + esc(info) + " Descarguen el informe (HTML) y entréguenlo al docente por otro medio.";
+        out.className = "send-status bad";
+      }
+    });
   }
 
   function saveValidation(form) {
@@ -1234,7 +1326,10 @@
       "<li>Las respuestas abiertas suman un puntaje provisorio (autoevaluación) hasta que usted lo valida en el informe; al validar, el porcentaje y las décimas se recalculan.</li>" +
       "<li>La comprobación individual se informa por separado para cada integrante y no entra en el porcentaje.</li></ul>" +
       "<h3>Almacenamiento</h3><p>El progreso se guarda solo en el navegador de cada equipo (localStorage). " + (ST.available ? "" : "<strong>En este navegador el almacenamiento no está disponible: el progreso se perderá al recargar.</strong> ") +
-      "La app no envía resultados a ningún servidor: pida a cada pareja imprimir o descargar su informe al terminar. Para otra pareja en el mismo equipo, use <em>Reiniciar</em>.</p>";
+      (informeUrl()
+        ? "Los informes llegan a su planilla de Google cuando cada pareja pulsa «Enviar informe al profesor» (se envían nombres, puntajes, resultados y respuestas abiertas). Si una pareja reenvía, se actualiza su misma fila. Para otra pareja en el mismo equipo, use <em>Reiniciar</em> después del envío.</p>" +
+          '<div class="actions"><button class="btn" data-action="test-send">Probar conexión con la planilla</button></div><p id="test-send-status" role="status" aria-live="polite"></p>'
+        : "La app no envía resultados a ningún servidor: pida a cada pareja imprimir o descargar su informe al terminar. Si quiere recibirlos en una planilla de Google, vea el README (sección «Recibir los informes»). Para otra pareja en el mismo equipo, use <em>Reiniciar</em>.</p>");
   }
 
   function tDecimas() {
@@ -1452,6 +1547,15 @@
         break;
       }
       case "export-frag-file": exportFragmentsFile(); break;
+      case "send-report": sendReportFromUI(btn); break;
+      case "test-send": {
+        var outT = $("#test-send-status");
+        outT.textContent = "Enviando fila de prueba…";
+        sendReport({ "ID": "PRUEBA", "Fecha": today(), "Integrante 1": "Prueba", "Integrante 2": "Docente", "Porcentaje": 0, "Recomendaciones": "Fila de prueba: puede borrarla." }, function (ok, info) {
+          outT.textContent = ok ? "✓ Funciona: revise su planilla (fila «PRUEBA»; puede borrarla)." + (info === "sin-confirmacion" ? " (Sin confirmación del navegador: revise la planilla.)" : "") : "No funcionó: " + info;
+        });
+        break;
+      }
       case "export-frag": {
         var code = C.lecturas.map(function (r) {
           var f = { texto: ($("#fx-" + r.id) || {}).value || "", edicion: ($("#fe-" + r.id) || {}).value || "", pagina: ($("#fp-" + r.id) || {}).value || "" };
@@ -1571,6 +1675,9 @@
       notice.hidden = false;
     } else if (!ST.get(KEYS.notice, false)) {
       notice.hidden = false;
+    }
+    if (ST.available && informeUrl()) {
+      notice.querySelector("p").innerHTML = "<strong>Importante:</strong> el progreso se guarda solo en este navegador y en este equipo. Al terminar, pulsen <strong>«Enviar informe al profesor»</strong> en el informe: se enviarán sus nombres, puntajes y respuestas a la planilla del docente. Nada se envía antes de pulsar ese botón.";
     }
     if (state.timerEnd && state.timerEnd < Date.now() && state.timerWarned) document.getElementById("timer-banner").hidden = false;
     window.addEventListener("hashchange", render);
