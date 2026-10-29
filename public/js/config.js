@@ -23,6 +23,10 @@ window.KANT_CONFIG = {
      estudiantes entren por accidente. Cualquiera que lea el código puede
      verla. Cámbiala antes de usar la actividad. */
   teacherPin: "Df.22793",
+     colegios: [
+    { id: "terranova", nombre: "Colegio Quillota Terranova", informeUrl: "" },
+    { id: "sanagustin", nombre: "San Agustín", informeUrl: "https://script.google.com/macros/s/AKfycbxkbIL0mXCPiHLVBRixixfUKQyu8z9JouvDdyTzEc0VgCxkC3EGM4uEnzWxrmd_l4hI/exec" }
+  ],
 
   /* ---------------- Puntaje de evaluación (PE) ----------------
      Porcentaje del valor del desafío que se obtiene según el intento
