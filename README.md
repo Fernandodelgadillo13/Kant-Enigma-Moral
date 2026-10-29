@@ -5,7 +5,7 @@ Trabaja **solo** el Prefacio y la Primera sección de la *Fundamentación de la 
 
 - HTML, CSS y JavaScript sin frameworks ni dependencias externas.
 - **Fase 1** (implementada): funciona solo con Firebase Hosting y guarda el progreso en `localStorage`.
-- **Fase 2** (Firebase Auth + Firestore): **no implementada**. La aplicación no envía ni guarda resultados en ningún servidor.
+- **Fase 2** (Firebase Auth + Firestore): **no implementada**. Opcionalmente, los informes pueden enviarse a una planilla de Google del docente (ver «Recibir los informes»). Sin esa configuración, la app no envía nada a ningún servidor.
 
 ## Sobre los textos de Kant
 
@@ -134,6 +134,21 @@ Sobre el secreto, elija **una** de estas opciones:
 
 Con esto, cada push a `main` ejecuta las pruebas y luego despliega al sitio en vivo. Cada pull request ejecuta las pruebas y publica un enlace de vista previa (expira en 7 días) como comentario.
 
+## Recibir los informes en una planilla de Google (opcional)
+
+Con esto aparece en el informe el botón **«Enviar informe al profesor»**. Cada pareja llena una fila en su planilla: nombres, fecha, porcentaje, PE, décimas, resultados por zona, comprobación individual y respuestas abiertas. Si reenvía (por ejemplo, después de la validación docente), se actualiza la misma fila.
+
+1. Cree una planilla en Google Sheets.
+2. **Extensiones → Apps Script**. Borre lo que aparece, pegue el contenido de `docs/receptor-informes.gs` y guarde.
+3. **Implementar → Nueva implementación → Aplicación web**. Use **Ejecutar como: Yo** y **Quién tiene acceso: Cualquier persona**. Autorice los permisos.
+4. Copie la **URL de la aplicación web** (termina en `/exec`).
+5. En `public/js/config.js`, ponga esa URL en `informeUrl: "…",` y vuelva a desplegar.
+6. En el Panel docente → Instrucciones, pulse **«Probar conexión con la planilla»**.
+
+Notas:
+- La URL queda visible en el código del sitio. Cualquiera que la encuentre podría enviar filas falsas. Revise que los nombres coincidan con su curso y, después de la actividad, puede desactivar la implementación en Apps Script.
+- Mientras `informeUrl` esté vacío, la app no envía nada a ningún servidor.
+
 ## Configuración (docente)
 
 Puede editar `public/js/config.js` o usar el **Panel docente** dentro de la app (botón superior derecho, clave inicial `kant1785`; **cámbiela** en `config.js`).
@@ -148,6 +163,10 @@ Los cambios del panel quedan en ese navegador y tienen prioridad sobre `config.j
 
 > La clave docente **no es una medida de seguridad**: está en el código fuente y solo evita entradas accidentales. Para un control real del acceso se necesitaría la Fase 2 (Firebase Authentication), que no está implementada.
 
+## Tema de Halloween 🎃
+
+`public/css/halloween.css` agrega murciélagos, luna, niebla, araña, telarañas, calabazas y un fantasma al ganar un sello. Se activa solo entre el 15 de octubre y el 2 de noviembre; el botón 🎃 de la barra lo enciende o apaga en cada navegador. Respeta «reducir movimiento», no se imprime y la decoración no recibe clics. Para quitarlo del todo, borre la línea que carga `halloween.css` en `index.html`.
+
 ## Reglas de puntaje (resumen)
 
 - PE por desafío: 100 % en el 1.er intento, 50 % en el 2.º y 25 % en el 3.º. La pista descuenta un 25 % del valor del desafío (mínimo 0). Hay un máximo de 3 intentos; después se muestra la solución explicada con 0 PE.
@@ -159,5 +178,5 @@ Los cambios del panel quedan en ese navegador y tienen prioridad sobre `config.j
 
 - **Almacenamiento**: el progreso vive solo en el navegador de cada equipo. Si se borran los datos del navegador, se usa una ventana privada estricta o se cambia de equipo, se pierde. Si el navegador bloquea `localStorage`, la app avisa y funciona en memoria (se pierde al recargar). Por eso cada pareja debe **imprimir o descargar su informe**.
 - **Validación docente**: se hace en el mismo navegador de la pareja, desde el informe y con la sesión docente abierta.
-- **Despliegue**: los archivos de Firebase y GitHub Actions siguen la configuración estándar, pero **no se probaron contra un proyecto Firebase real**. Las pruebas Playwright se ejecutaron localmente y pasan (6/6).
+- **Despliegue**: los archivos de Firebase y GitHub Actions siguen la configuración estándar, pero **no se probaron contra un proyecto Firebase real**. Las pruebas Playwright se ejecutaron localmente y pasan (8/8). El envío a la planilla se probó con una planilla simulada; la conexión con Google Apps Script real no pudo probarse desde aquí.
 - **Fragmentos**: la app no incluye texto de Kant. El docente es responsable de usar fragmentos de una edición que pueda reproducir y de citar edición y página.
