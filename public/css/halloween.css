@@ -1,0 +1,206 @@
+/* =====================================================================
+   TEMA HALLOWEEN 🎃
+   Se activa con la clase body.theme-halloween (automático entre el
+   15 de octubre y el 2 de noviembre, o con el botón 🎃 de la barra).
+   Para quitarlo del todo, borre la línea que carga este archivo en
+   index.html. La lectura conserva fondos sólidos y buen contraste.
+   ===================================================================== */
+
+body.theme-halloween {
+  --bg: #120a1f;
+  --bg2: #0b0614;
+  --panel: #1d1230;
+  --panel2: #2a1a44;
+  --line: #4a2f6e;
+  --text: #f4ecdf;
+  --muted: #c9bcd9;
+  --gold: #ff8a2a;
+  --gold-d: #d35400;
+  --teal: #9dff6a;
+  --violet: #c49bff;
+  --ok: #9dff6a;
+  --bad: #ff8f8f;
+  --warn: #ffc163;
+  --focus: #ffd36b;
+  background:
+    radial-gradient(900px 500px at 85% -5%, rgba(255, 138, 42, .18), transparent 60%),
+    radial-gradient(800px 500px at -10% 110%, rgba(157, 255, 106, .08), transparent 60%),
+    linear-gradient(180deg, #160b26 0%, #120a1f 40%, #0d0717 100%);
+  background-attachment: fixed;
+}
+body.theme-halloween h1 { text-shadow: 0 0 18px rgba(255, 138, 42, .35); letter-spacing: .01em; }
+body.theme-halloween .topbar { background: rgba(11, 6, 20, .92); border-bottom-color: #ff8a2a55; }
+body.theme-halloween .brand { color: #ff8a2a; }
+body.theme-halloween .btn.primary {
+  background: linear-gradient(180deg, #ffb35c, #e2640b);
+  border-color: #ffc98a; color: #1a0b00;
+  box-shadow: 0 0 14px rgba(255, 138, 42, .35);
+}
+body.theme-halloween .btn:hover { border-color: #ff8a2a; box-shadow: 0 0 10px rgba(255, 138, 42, .25); }
+body.theme-halloween .xpbar span { background: linear-gradient(90deg, #ff8a2a, #9dff6a); }
+body.theme-halloween .pill { background: #ff8a2a; color: #1a0b00; }
+body.theme-halloween .mini-seal.on { color: #ff8a2a; filter: drop-shadow(0 0 4px #ff8a2a); }
+body.theme-halloween .card { box-shadow: 0 10px 30px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 138, 42, .05); }
+body.theme-halloween .hero .subtitle { color: #9dff6a; }
+body.theme-halloween .hw-badge {
+  display: inline-block; margin-top: .6rem; padding: .2rem .8rem; border-radius: 999px;
+  border: 1px solid #ff8a2a; color: #ff8a2a; font-family: var(--sans); font-size: .9rem;
+  animation: hw-glow 3s ease-in-out infinite;
+}
+.hw-badge { display: none; }
+
+/* Lecturas: fondos sólidos para leer tranquilos */
+body.theme-halloween .panel { background: #1d1230; }
+body.theme-halloween .panel.fragment { background: linear-gradient(180deg, rgba(255, 138, 42, .10), #1d1230); border-left-color: #ff8a2a; }
+body.theme-halloween .panel.explain { border-left-color: #9dff6a; }
+body.theme-halloween .panel.context { border-left-color: #c49bff; }
+body.theme-halloween .kant-quote { border-left-color: #ff8a2a; background: rgba(0, 0, 0, .35); }
+body.theme-halloween .label-quote { color: #ff8a2a; border-color: #ff8a2a; background: rgba(255, 138, 42, .12); }
+body.theme-halloween .label-noquote { color: #9dff6a; border-color: #9dff6a; background: rgba(157, 255, 106, .1); }
+
+/* Mapa: cementerio a la luz de la luna */
+body.theme-halloween .map { background: radial-gradient(circle at 78% 18%, #3a2357 0%, #1a0f2b 45%, #0b0614 100%); border-color: #4a2f6e; }
+body.theme-halloween .node-btn { background: rgba(20, 10, 34, .92); }
+body.theme-halloween .map-node.unlocked:not(.done) .node-btn { border-color: #ff8a2a; animation: hw-flicker 3.2s infinite; }
+body.theme-halloween .map-node.done .node-btn { border-color: #9dff6a; }
+body.theme-halloween .node-name { color: #ffb35c; }
+body.theme-halloween .node-seal { color: #ff8a2a; }
+body.theme-halloween .icon .hw-eyes { animation: hw-blink 4s infinite; transform-origin: center; }
+body.theme-halloween .icon .hw-flame { animation: hw-candle 1.4s ease-in-out infinite alternate; transform-origin: 32px 40px; }
+body.theme-halloween .icon .hw-bubble { animation: hw-bubble 2.4s ease-in infinite; }
+body.theme-halloween .icon .hw-bubble.b2 { animation-delay: .8s; }
+body.theme-halloween .icon .hw-bubble.b3 { animation-delay: 1.6s; }
+body.theme-halloween .letter.on { border-color: #ff8a2a; color: #ff8a2a; background: rgba(255, 138, 42, .12); }
+
+/* Retroalimentación */
+body.theme-halloween .fb-ok { position: relative; border-color: #9dff6a; background: rgba(157, 255, 106, .08); }
+body.theme-halloween .fb-ok::after {
+  content: "🎃"; position: absolute; right: .8rem; top: -.9rem; font-size: 1.8rem;
+  animation: hw-pumpkin-pop .8s cubic-bezier(.2, 1.6, .4, 1) both;
+}
+body.theme-halloween .fb-bad { border-color: #ff8f8f; }
+body.theme-halloween .hint { border-color: #c49bff; }
+
+/* Sello: fantasma que sube */
+body.theme-halloween .overlay-card { border-color: #ff8a2a; box-shadow: 0 0 60px rgba(255, 138, 42, .4); background: #1d1230; }
+body.theme-halloween .stamp { color: #ff8a2a; }
+.hw-ghost-pop { display: none; }
+body.theme-halloween .hw-ghost-pop { display: block; height: 70px; margin: 0 auto -6px; pointer-events: none; animation: hw-ghost-rise 1.6s ease-out both; }
+.hw-ghost-pop svg { width: 56px; height: 70px; display: block; margin: 0 auto; }
+
+/* ---------- Decoración de fondo (no recibe clics ni foco) ---------- */
+#decor { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; display: none; }
+body.theme-halloween #decor { display: block; }
+body.theme-halloween main, body.theme-halloween .footer, body.theme-halloween .notice { position: relative; z-index: 1; }
+
+.hw-moon {
+  position: absolute; top: 90px; right: 6vw; width: 110px; height: 110px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #fff6d8, #ffd98a 55%, #e9b45a 100%);
+  box-shadow: 0 0 60px 18px rgba(255, 210, 120, .25);
+  opacity: .55; animation: hw-moon 9s ease-in-out infinite;
+}
+.hw-moon::before, .hw-moon::after { content: ""; position: absolute; border-radius: 50%; background: rgba(200, 150, 70, .35); }
+.hw-moon::before { width: 22px; height: 22px; left: 28px; top: 40px; }
+.hw-moon::after { width: 14px; height: 14px; left: 66px; top: 64px; }
+
+.hw-bat { position: absolute; left: -80px; width: 54px; color: #05020a; opacity: .85; animation: hw-fly 22s linear infinite; }
+.hw-bat svg { width: 100%; height: auto; display: block; }
+.hw-bat .wing { animation: hw-flap .28s ease-in-out infinite alternate; transform-origin: 32px 18px; }
+.hw-bat.b1 { top: 18vh; animation-duration: 24s; }
+.hw-bat.b2 { top: 34vh; width: 38px; animation-duration: 31s; animation-delay: 7s; opacity: .7; }
+.hw-bat.b3 { top: 12vh; width: 30px; animation-duration: 27s; animation-delay: 15s; opacity: .6; }
+.hw-bat.b4 { top: 52vh; width: 44px; animation-duration: 36s; animation-delay: 22s; opacity: .55; }
+
+.hw-spider { position: absolute; top: 0; left: 4vw; width: 40px; animation: hw-dangle 7s ease-in-out infinite; transform-origin: 20px 0; }
+.hw-spider .thread { width: 2px; height: 120px; margin: 0 auto; background: linear-gradient(#ffffff00, #ffffff66); }
+.hw-spider svg { display: block; width: 40px; height: auto; margin-top: -2px; }
+
+.hw-web { position: absolute; width: 170px; height: 170px; opacity: .22; color: #e9e1ff; }
+.hw-web.tl { top: 52px; left: 0; }
+.hw-web.br { bottom: 0; right: 0; transform: rotate(180deg); }
+
+.hw-fog { position: absolute; left: -10%; width: 120%; height: 160px; bottom: -40px; filter: blur(22px); opacity: .32;
+  background: radial-gradient(ellipse at 20% 60%, #b9a6d6 0, transparent 60%), radial-gradient(ellipse at 70% 50%, #9e8bc0 0, transparent 60%);
+  animation: hw-fog 28s ease-in-out infinite alternate; }
+.hw-fog.f2 { bottom: -70px; opacity: .22; animation-duration: 40s; animation-direction: alternate-reverse; }
+
+.hw-ghost { position: absolute; bottom: 14vh; left: -100px; width: 60px; opacity: .0; animation: hw-ghost-float 30s ease-in-out infinite; animation-delay: 5s; color: #f4ecff; }
+.hw-ghost svg { width: 100%; height: auto; }
+
+.hw-pumpkins { position: absolute; bottom: 8px; left: 2vw; display: flex; gap: 6px; opacity: .9; }
+.hw-pumpkins svg { width: 46px; height: auto; }
+.hw-pumpkins .glow { animation: hw-candle 1.6s ease-in-out infinite alternate; }
+
+/* ---------- Animaciones ---------- */
+@keyframes hw-fly {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30vw, -6vh) scale(1.05); }
+  50% { transform: translate(60vw, 4vh) scale(.95); }
+  75% { transform: translate(85vw, -4vh) scale(1); }
+  100% { transform: translate(115vw, 2vh) scale(1); }
+}
+@keyframes hw-flap { from { transform: scaleY(1); } to { transform: scaleY(.35); } }
+@keyframes hw-dangle { 0%, 100% { transform: translateY(-30px) rotate(-3deg); } 50% { transform: translateY(10px) rotate(3deg); } }
+@keyframes hw-fog { from { transform: translateX(-4%); } to { transform: translateX(4%); } }
+@keyframes hw-moon { 0%, 100% { box-shadow: 0 0 60px 18px rgba(255, 210, 120, .22); } 50% { box-shadow: 0 0 80px 26px rgba(255, 210, 120, .32); } }
+@keyframes hw-ghost-float {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: .55; }
+  50% { transform: translate(55vw, -6vh); opacity: .45; }
+  90% { opacity: .5; }
+  100% { transform: translate(115vw, 0); opacity: 0; }
+}
+@keyframes hw-flicker {
+  0%, 100% { box-shadow: 0 0 18px rgba(255, 138, 42, .45); }
+  45% { box-shadow: 0 0 8px rgba(255, 138, 42, .25); }
+  50% { box-shadow: 0 0 26px rgba(255, 138, 42, .6); }
+  55% { box-shadow: 0 0 12px rgba(255, 138, 42, .3); }
+}
+@keyframes hw-glow { 0%, 100% { box-shadow: 0 0 0 rgba(255, 138, 42, 0); } 50% { box-shadow: 0 0 14px rgba(255, 138, 42, .5); } }
+@keyframes hw-candle { from { opacity: .7; } to { opacity: 1; } }
+@keyframes hw-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes hw-bubble { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-14px); opacity: 0; } }
+@keyframes hw-pumpkin-pop { 0% { transform: scale(0) rotate(-30deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes hw-ghost-rise { 0% { transform: translateY(40px); opacity: 0; } 60% { opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+
+/* ---------- Fondo claro + Halloween ---------- */
+body.light.theme-halloween {
+  --bg: #fbf1e4; --bg2: #ffffff; --panel: #fffaf3; --panel2: #f6e6d2; --line: #d8b894;
+  --text: #20152c; --muted: #5a4b66; --gold: #b84a00; --gold-d: #b84a00; --teal: #2f7a12; --violet: #6a3fb5;
+  --ok: #2f7a12; --bad: #a3271a; --warn: #8a5a00; --focus: #1d4ed8;
+  background: var(--bg);
+}
+body.light.theme-halloween .topbar { background: rgba(251, 241, 228, .95); }
+body.light.theme-halloween .panel, body.light.theme-halloween .overlay-card { background: #fffaf3; }
+body.light.theme-halloween .panel.fragment { background: #fff3e3; }
+body.light.theme-halloween .kant-quote { background: #fbe9d3; }
+body.light.theme-halloween .node-btn { background: rgba(255, 250, 243, .95); }
+body.light.theme-halloween .map { background: radial-gradient(circle at 78% 18%, #f3e0c6, #fbf1e4 70%); }
+body.light.theme-halloween .hw-bat { color: #3a2a4a; opacity: .45; }
+body.light.theme-halloween .hw-fog { opacity: .15; }
+body.light.theme-halloween .hw-web { color: #6a5a7a; }
+
+/* Títulos que reciben foco al cambiar de vista: sin recuadro visible
+   (el foco sigue llegando ahí para lectores de pantalla). */
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
+
+/* ---------- Móvil: menos decoración ---------- */
+@media (max-width: 760px) {
+  .hw-pumpkins { display: none; }
+  .hw-moon { width: 70px; height: 70px; top: 70px; opacity: .4; }
+  .hw-bat.b3, .hw-bat.b4, .hw-web.br, .hw-ghost { display: none; }
+  .hw-web.tl { width: 110px; height: 110px; }
+  .hw-spider .thread { height: 70px; }
+  .hw-pumpkins svg { width: 34px; }
+}
+
+/* ---------- Respeto a "reducir movimiento" ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hw-bat, .hw-ghost { display: none; }
+}
+
+/* ---------- Impresión: sin decoración ---------- */
+@media print {
+  #decor, .hw-badge, .hw-ghost-pop { display: none !important; }
+  body.theme-halloween .fb-ok::after { content: none; }
+}
