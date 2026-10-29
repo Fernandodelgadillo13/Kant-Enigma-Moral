@@ -24,7 +24,7 @@ window.KANT_CONFIG = {
      verla. Cámbiala antes de usar la actividad. */
   teacherPin: "Df.22793",
      colegios: [
-    { id: "terranova", nombre: "Colegio Quillota Terranova", informeUrl: "" },
+    { id: "terranova", nombre: "Colegio Quillota Terranova", informeUrl: "https://script.google.com/macros/s/AKfycbxKquh2D2KmxB26tF49hyPXrGA_3_Npx6tTrrZ1JQUE2PuZ4ffkbLNMxuJ_IcahQg9vWg/exec" },
     { id: "sanagustin", nombre: "San Agustín", informeUrl: "https://script.google.com/macros/s/AKfycbxkbIL0mXCPiHLVBRixixfUKQyu8z9JouvDdyTzEc0VgCxkC3EGM4uEnzWxrmd_l4hI/exec" }
   ],
 
