@@ -1,12 +1,15 @@
 // Utilidades para recorrer la aplicación como lo haría una pareja.
 const { expect } = require("@playwright/test");
 
-async function startGame(page, n1 = "Ana", n2 = "Benjamín") {
-  await page.goto("/");
+async function startGame(page, n1 = "Ana", n2 = "Benjamín", path = "/") {
+  await page.goto(path);
   await page.evaluate(() => localStorage.clear());
-  await page.goto("/#/inicio");
+  await page.goto(path + "#/inicio");
   await page.fill("#n1", n1);
   await page.fill("#n2", n2);
+  // Si hay colegios configurados y no vienen fijos en el enlace, se elige el primero
+  const sel = page.locator("select#colegio");
+  if (await sel.count()) await sel.selectOption({ index: 1 });
   await page.check("#rules-ok");
   await page.click("button:has-text('Entrar a la biblioteca')");
   await expect(page.locator("h1")).toHaveText("Mapa de la biblioteca");

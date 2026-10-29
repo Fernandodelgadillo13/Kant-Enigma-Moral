@@ -207,6 +207,7 @@ test("archivo de fragmentos: el docente lo descarga y otra pareja lo carga sin p
   await p2.setInputFiles("#frag-file-start", filePath);
   await expect(p2.locator("#frag-status")).toContainText("10 de 10");
   await p2.fill("#n1", "Carla"); await p2.fill("#n2", "Diego"); await p2.check("#rules-ok");
+  if (await p2.locator("select#colegio").count()) await p2.selectOption("select#colegio", { index: 1 });
   await p2.click("button:has-text('Entrar a la biblioteca')");
   await p2.evaluate(() => { const s = window.__kant.state(); s.seals.z1 = true; });
   await p2.goto("/#/lectura/r5");
@@ -267,4 +268,63 @@ test("envío del informe a la planilla del docente (simulada)", async ({ page })
   modo = "error";
   await page.click("button[data-action=send-report]");
   await expect(page.locator("#send-status")).toContainText("No se pudo enviar");
+});
+
+test("dos colegios: el enlace fija el colegio y el informe va a SU planilla", async ({ page }) => {
+  const URLS = { terranova: "https://script.google.com/macros/s/TERRANOVA/exec", sanagustin: "https://script.google.com/macros/s/SANAGUSTIN/exec" };
+  await page.route("**/js/config.js", async (route) => {
+    const res = await route.fetch();
+    const body = (await res.text()) + `\nwindow.KANT_CONFIG.colegios = [
+      { id: "terranova", nombre: "Colegio Quillota Terranova", informeUrl: ${JSON.stringify(URLS.terranova)} },
+      { id: "sanagustin", nombre: "San Agustín", informeUrl: ${JSON.stringify(URLS.sanagustin)} }];`;
+    await route.fulfill({ response: res, body });
+  });
+  const llegadas = { terranova: [], sanagustin: [] };
+  for (const [id, url] of Object.entries(URLS)) {
+    await page.route(url, async (route) => {
+      llegadas[id].push(JSON.parse(route.request().postData()));
+      await route.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: '{"ok":true}' });
+    });
+  }
+  // Enlace de San Agustín: el colegio aparece fijo, sin selector
+  await page.goto("/?colegio=sanagustin");
+  await page.evaluate(() => localStorage.clear());
+  await page.goto("/?colegio=sanagustin#/inicio");
+  await expect(page.locator(".school-fixed")).toContainText("San Agustín");
+  await expect(page.locator("select#colegio")).toHaveCount(0);
+  await page.fill("#n1", "Carla"); await page.fill("#n2", "Diego"); await page.fill("#curso", "3° medio B");
+  await page.check("#rules-ok");
+  await page.click("button:has-text('Entrar a la biblioteca')");
+  await page.goto("/?colegio=sanagustin#/informe");
+  await expect(page.locator("#report")).toContainText("San Agustín");
+  await page.click("button[data-action=send-report]");
+  await expect(page.locator("#send-status")).toContainText("✓");
+  expect(llegadas.sanagustin.length).toBe(1);
+  expect(llegadas.terranova.length).toBe(0);
+  expect(llegadas.sanagustin[0].fila["Colegio"]).toBe("San Agustín");
+  expect(llegadas.sanagustin[0].fila["Curso"]).toBe("3° medio B");
+
+  // Sin enlace de colegio: la pareja debe elegirlo
+  await page.goto("/");
+  await page.evaluate(() => localStorage.clear());
+  await page.goto("/#/inicio");
+  await page.reload();
+  await page.fill("#n1", "Eva"); await page.fill("#n2", "Fito"); await page.check("#rules-ok");
+  await page.click("button:has-text('Entrar a la biblioteca')");
+  await expect(page.locator("#start-error")).toContainText("Elijan su colegio");
+  await page.selectOption("select#colegio", "terranova");
+  await page.click("button:has-text('Entrar a la biblioteca')");
+  await page.goto("/#/informe");
+  await page.click("button[data-action=send-report]");
+  await expect(page.locator("#send-status")).toContainText("✓");
+  expect(llegadas.terranova.length).toBe(1);
+
+  // Panel docente: enlaces por colegio y prueba de conexión
+  await page.goto("/#/docente");
+  await page.fill("#pin", await page.evaluate(() => window.KANT_CONFIG.teacherPin));
+  await page.click("button:has-text('Entrar')");
+  await expect(page.locator(".link-code").nth(0)).toContainText("?colegio=terranova");
+  await page.click("button[data-action=test-send][data-school=sanagustin]");
+  await expect(page.locator("#test-send-status")).toContainText("Funciona");
+  expect(llegadas.sanagustin.at(-1).fila["ID"]).toBe("PRUEBA-sanagustin");
 });
