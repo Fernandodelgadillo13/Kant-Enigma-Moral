@@ -222,3 +222,49 @@ test("archivo de fragmentos: el docente lo descarga y otra pareja lo carga sin p
   await expect(p2.locator(".toast-item").last()).toContainText("no es un archivo de fragmentos");
   await ctx.close();
 });
+
+test("envío del informe a la planilla del docente (simulada)", async ({ page }) => {
+  const URL_PLANILLA = "https://script.google.com/macros/s/PRUEBA/exec";
+  // Sin planilla configurada no hay botón de envío
+  await startGame(page);
+  await page.goto("/#/informe");
+  await expect(page.locator("button[data-action=send-report]")).toHaveCount(0);
+
+  // Con planilla configurada (se inyecta en config.js solo para esta prueba)
+  await page.route("**/js/config.js", async (route) => {
+    const res = await route.fetch();
+    const body = (await res.text()) + `\nwindow.KANT_CONFIG.informeUrl = ${JSON.stringify(URL_PLANILLA)};`;
+    await route.fulfill({ response: res, body });
+  });
+  const recibidos = [];
+  let modo = "ok";
+  await page.route(URL_PLANILLA, async (route) => {
+    recibidos.push(JSON.parse(route.request().postData()));
+    if (modo === "error") return route.fulfill({ status: 500, body: "fallo", headers: { "access-control-allow-origin": "*" } });
+    await route.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ ok: true, actualizado: recibidos.length > 1 }) });
+  });
+  await page.reload();
+  await expect(page.locator("#storage-notice p")).toContainText("Enviar informe al profesor");
+  await openReading(page, "r1");
+  await solve(page, "c1");
+  await page.goto("/#/informe");
+  await page.click("button[data-action=send-report]");
+  await expect(page.locator("#send-status")).toContainText("✓ Informe enviado");
+  const fila = recibidos[0].fila;
+  expect(fila["Integrante 1"]).toBe("Ana");
+  expect(fila["Integrante 2"]).toBe("Benjamín");
+  expect(fila["PE"]).toBe(10);
+  expect(fila["PE máximo"]).toBe(420);
+  expect(fila["ID"]).toMatch(/^P-/);
+  expect(fila["c18 respuesta"]).toBe("sin respuesta");
+
+  // Reenviar actualiza la misma fila (mismo ID)
+  await page.click("button[data-action=send-report]");
+  await expect(page.locator("#send-status")).toContainText("✓ Informe actualizado");
+  expect(recibidos[1].fila["ID"]).toBe(fila["ID"]);
+
+  // Si la planilla falla, se avisa y se sugiere descargar
+  modo = "error";
+  await page.click("button[data-action=send-report]");
+  await expect(page.locator("#send-status")).toContainText("No se pudo enviar");
+});
