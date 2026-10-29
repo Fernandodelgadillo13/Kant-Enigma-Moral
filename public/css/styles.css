@@ -351,3 +351,9 @@ body.light .tab.on { background: #b23a4c; color: #fff; }
 /* Botón para cargar archivo de fragmentos */
 .file-btn { cursor: pointer; font-weight: 600; }
 .frag-file:focus-visible + .file-btn { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* Envío del informe al profesor */
+.send-card { border-color: var(--teal); }
+.send-status { min-height: 1.2em; }
+.send-status.ok { color: var(--ok); }
+.send-status.bad { color: var(--bad); }
