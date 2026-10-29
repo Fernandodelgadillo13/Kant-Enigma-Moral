@@ -90,7 +90,7 @@
   }
   function newState() {
     return {
-      version: BASE.version, started: false, names: ["", ""], fecha: null, startedAt: null,
+      version: BASE.version, started: false, names: ["", ""], fecha: null, startedAt: null, colegio: "", curso: "",
       readings: {}, pre: {}, challenges: {}, seals: {}, badges: {},
       xp: 0, streak: 0, noHintZones: {},
       individual: { started: [false, false], answers: {}, idx: [0, 0] },
@@ -504,13 +504,22 @@
     download("fragmentos-kant.json", JSON.stringify({ tipo: FRAG_FILE_TYPE, version: 1, creado: new Date().toISOString(), fragmentos: out }, null, 2), "application/json");
   }
 
+  function schoolFieldHtml() {
+    var list = schools();
+    if (!list.length) return "";
+    var fixed = urlSchool();
+    if (fixed) return '<p class="school-fixed">Colegio: <strong>' + esc(schoolById(fixed).nombre) + '</strong></p><input type="hidden" id="colegio" value="' + esc(fixed) + '">';
+    return '<div class="field"><label for="colegio">Colegio</label><select id="colegio" required><option value="">— Elijan su colegio —</option>' +
+      list.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.nombre) + "</option>"; }).join("") + "</select></div>";
+  }
+
   function viewStart() {
     var hero = '<section class="hero"><div class="hero-art" aria-hidden="true">' + svgIcon("manuscrito", 72) + svgIcon("puerta", 72) + svgIcon("sello", 72) + "</div>" +
       "<h1>" + esc(C.titulo) + '<span class="subtitle">' + esc(C.subtitulo) + "</span></h1>" +
       '<p class="hw-badge">🎃 Edición noche de brujas: la biblioteca abre a medianoche</p>' +
       '<p class="lead">Una misteriosa biblioteca guarda la respuesta a una pregunta antigua: <em>¿qué hace que una acción sea moralmente buena?</em> Para abrir la Puerta del juicio final deberán reunir tres sellos, leyendo y razonando como Immanuel Kant en el Prefacio y la Primera sección de la <em>Fundamentación de la metafísica de las costumbres</em>.</p></section>';
     if (state.started) {
-      return hero + '<section class="card"><h2>Partida en curso</h2><p>Equipo: <strong>' + esc(state.names[0]) + "</strong> y <strong>" + esc(state.names[1]) + "</strong> · iniciada el " + esc(state.fecha) + ".</p>" +
+      return hero + '<section class="card"><h2>Partida en curso</h2><p>Equipo: <strong>' + esc(state.names[0]) + "</strong> y <strong>" + esc(state.names[1]) + "</strong>" + (schoolName() ? " · " + esc(schoolName()) : "") + (state.curso ? " · " + esc(state.curso) : "") + " · iniciada el " + esc(state.fecha) + ".</p>" +
         '<div class="actions"><button class="btn primary" data-action="go" data-to="mapa">Continuar la aventura</button>' +
         '<button class="btn" data-action="new-game">Nueva partida</button></div></section>' + fragCardHtml() + rulesHtml();
     }
@@ -518,6 +527,8 @@
       '<form class="card" id="start-form" novalidate aria-labelledby="start-h"><h2 id="start-h">Formen su pareja</h2>' +
       '<div class="field"><label for="n1">Nombre del integrante 1</label><input id="n1" name="n1" autocomplete="off" required maxlength="60"></div>' +
       '<div class="field"><label for="n2">Nombre del integrante 2</label><input id="n2" name="n2" autocomplete="off" required maxlength="60"></div>' +
+      schoolFieldHtml() +
+      '<div class="field"><label for="curso">Curso <span class="muted">(opcional, por ejemplo «3° medio A»)</span></label><input id="curso" name="curso" autocomplete="off" maxlength="40"></div>' +
       '<p class="form-error" id="start-error" role="alert"></p>' +
       '<label class="check"><input type="checkbox" id="rules-ok" required> Leímos las reglas de puntaje y décimas.</label>' +
       '<div class="actions"><button class="btn primary" type="submit">Entrar a la biblioteca</button></div></form>' +
@@ -1142,7 +1153,8 @@
       '<button class="btn" data-action="go" data-to="mapa">Volver al mapa</button></div>' +
       '<article id="report" class="report card">' +
       '<header><p class="kicker">Informe final</p><h1>' + esc(C.titulo) + ": " + esc(C.subtitulo) + "</h1>" +
-      "<p><strong>Integrantes:</strong> " + esc(state.names[0]) + " y " + esc(state.names[1]) + " · <strong>Fecha:</strong> " + esc(state.fecha || today()) + "</p>" +
+      "<p><strong>Integrantes:</strong> " + esc(state.names[0]) + " y " + esc(state.names[1]) + " · <strong>Fecha:</strong> " + esc(state.fecha || today()) +
+      (schoolName() ? " · <strong>Colegio:</strong> " + esc(schoolName()) : "") + (state.curso ? " · <strong>Curso:</strong> " + esc(state.curso) : "") + "</p>" +
       '<p class="muted small">Contenido: ' + esc(C.obra) + ".</p></header>" +
       '<section class="summary" aria-label="Resumen"><div class="big"><span>Porcentaje</span><strong data-testid="report-pct">' + S.formatPct(t.pct) + "</strong></div>" +
       '<div class="big"><span>PE</span><strong data-testid="report-pe">' + fmtNum(t.pe) + " / " + fmtNum(t.peMax) + "</strong></div>" +
@@ -1168,7 +1180,17 @@
      puntajes, resultados y respuestas abiertas. Reenviar actualiza la
      misma fila (se reconoce por el ID de la partida).
      ------------------------------------------------------------------ */
-  function informeUrl() { return String(cfg.informeUrl || BASE.informeUrl || "").trim(); }
+  function schools() { return Array.isArray(BASE.colegios) ? BASE.colegios.filter(function (c) { return c && c.id && c.nombre; }) : []; }
+  function schoolById(id) { return schools().find(function (c) { return c.id === id; }) || null; }
+  function urlSchool() {
+    try { var id = new URLSearchParams(location.search).get("colegio"); return schoolById(id) ? id : ""; } catch (e) { return ""; }
+  }
+  function schoolName() { var c = schoolById(state.colegio); return c ? c.nombre : ""; }
+  function informeUrl() {
+    var c = schoolById(state.colegio);
+    if (c && String(c.informeUrl || "").trim()) return String(c.informeUrl).trim();
+    return String(cfg.informeUrl || BASE.informeUrl || "").trim();
+  }
   function reportId() {
     if (!state.id) { state.id = "P-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7); save(); }
     return state.id;
@@ -1177,7 +1199,7 @@
     var t = S.computeTotals(state, C, cfg);
     var pct = function (x) { return Math.round(x * 10) / 10; };
     var row = {
-      "ID": reportId(), "Fecha": state.fecha || today(),
+      "ID": reportId(), "Fecha": state.fecha || today(), "Colegio": schoolName(), "Curso": state.curso || "",
       "Integrante 1": state.names[0] || "", "Integrante 2": state.names[1] || "",
       "Porcentaje": pct(t.pct), "PE": t.pe, "PE máximo": t.peMax, "Décimas": t.decimas,
       "Provisorio": t.provisional ? "Sí (falta validar respuestas abiertas)" : "No",
@@ -1204,8 +1226,8 @@
     });
     return row;
   }
-  function sendReport(fila, onDone) {
-    var url = informeUrl();
+  function sendReport(fila, onDone, urlOverride) {
+    var url = urlOverride || informeUrl();
     if (!url) { onDone(false, "No hay una planilla configurada."); return; }
     var body = JSON.stringify({ tipo: "kant-enigma-informe", version: 1, fila: fila });
     var finished = false;
@@ -1325,11 +1347,27 @@
       "<li>Porcentaje = PE obtenidos ÷ PE máximos de los desafíos activos (actualmente " + nCh + " desafíos). La XP no participa.</li>" +
       "<li>Las respuestas abiertas suman un puntaje provisorio (autoevaluación) hasta que usted lo valida en el informe; al validar, el porcentaje y las décimas se recalculan.</li>" +
       "<li>La comprobación individual se informa por separado para cada integrante y no entra en el porcentaje.</li></ul>" +
-      "<h3>Almacenamiento</h3><p>El progreso se guarda solo en el navegador de cada equipo (localStorage). " + (ST.available ? "" : "<strong>En este navegador el almacenamiento no está disponible: el progreso se perderá al recargar.</strong> ") +
-      (informeUrl()
-        ? "Los informes llegan a su planilla de Google cuando cada pareja pulsa «Enviar informe al profesor» (se envían nombres, puntajes, resultados y respuestas abiertas). Si una pareja reenvía, se actualiza su misma fila. Para otra pareja en el mismo equipo, use <em>Reiniciar</em> después del envío.</p>" +
-          '<div class="actions"><button class="btn" data-action="test-send">Probar conexión con la planilla</button></div><p id="test-send-status" role="status" aria-live="polite"></p>'
-        : "La app no envía resultados a ningún servidor: pida a cada pareja imprimir o descargar su informe al terminar. Si quiere recibirlos en una planilla de Google, vea el README (sección «Recibir los informes»). Para otra pareja en el mismo equipo, use <em>Reiniciar</em>.</p>");
+      "<h3>Almacenamiento y envío de informes</h3><p>El progreso se guarda solo en el navegador de cada equipo (localStorage). " + (ST.available ? "" : "<strong>En este navegador el almacenamiento no está disponible: el progreso se perderá al recargar.</strong> ") +
+      "Los informes se envían a una planilla de Google solo si está configurada y la pareja pulsa «Enviar informe al profesor». Para otra pareja en el mismo equipo, use <em>Reiniciar</em> después del envío o la descarga.</p>" +
+      schoolsPanelHtml();
+  }
+
+  function schoolsPanelHtml() {
+    var base = location.origin + location.pathname;
+    var list = schools();
+    if (!list.length) {
+      return informeUrl()
+        ? '<div class="actions"><button class="btn" data-action="test-send" data-school="">Probar conexión con la planilla</button></div><p id="test-send-status" role="status" aria-live="polite"></p>'
+        : "<p>No hay planilla configurada: la app no envía resultados a ningún servidor. Vea el README («Recibir los informes»).</p>";
+    }
+    return "<h3>Enlaces por colegio</h3><p>Entregue a cada colegio su enlace: el colegio queda fijo y los informes llegan a su planilla.</p>" +
+      '<table class="table"><thead><tr><th scope="col">Colegio</th><th scope="col">Enlace para estudiantes</th><th scope="col">Planilla</th></tr></thead><tbody>' +
+      list.map(function (c) {
+        var link = base + "?colegio=" + encodeURIComponent(c.id);
+        var has = String(c.informeUrl || "").trim();
+        return "<tr><th scope=\"row\">" + esc(c.nombre) + '</th><td><code class="link-code">' + esc(link) + "</code></td><td>" +
+          (has ? '<button class="btn small" data-action="test-send" data-school="' + esc(c.id) + '">Probar conexión</button>' : '<span class="muted">Sin planilla (no se envía)</span>') + "</td></tr>";
+      }).join("") + '</tbody></table><p id="test-send-status" role="status" aria-live="polite"></p>';
   }
 
   function tDecimas() {
@@ -1435,10 +1473,12 @@
      ------------------------------------------------------------------ */
   function confirmBox(msg) { try { return window.confirm(msg); } catch (e) { return true; } }
 
-  function startGame(names) {
+  function startGame(names, colegio, curso) {
     state = newState();
     state.started = true;
     state.names = names;
+    state.colegio = colegio || "";
+    state.curso = curso || "";
     state.fecha = today();
     state.startedAt = Date.now();
     if (cfg.timerMinutes > 0) state.timerEnd = Date.now() + cfg.timerMinutes * 60000;
@@ -1550,10 +1590,15 @@
       case "send-report": sendReportFromUI(btn); break;
       case "test-send": {
         var outT = $("#test-send-status");
+        var sid = btn.getAttribute("data-school") || "";
+        var prevCol = state.colegio;
+        state.colegio = sid;
+        var testUrl = informeUrl();
+        state.colegio = prevCol;
         outT.textContent = "Enviando fila de prueba…";
-        sendReport({ "ID": "PRUEBA", "Fecha": today(), "Integrante 1": "Prueba", "Integrante 2": "Docente", "Porcentaje": 0, "Recomendaciones": "Fila de prueba: puede borrarla." }, function (ok, info) {
+        sendReport({ "ID": "PRUEBA-" + (sid || "general"), "Fecha": today(), "Colegio": sid ? schoolById(sid).nombre : "", "Integrante 1": "Prueba", "Integrante 2": "Docente", "Porcentaje": 0, "Recomendaciones": "Fila de prueba: puede borrarla." }, function (ok, info) {
           outT.textContent = ok ? "✓ Funciona: revise su planilla (fila «PRUEBA»; puede borrarla)." + (info === "sin-confirmacion" ? " (Sin confirmación del navegador: revise la planilla.)" : "") : "No funcionó: " + info;
-        });
+        }, testUrl);
         break;
       }
       case "export-frag": {
@@ -1581,8 +1626,11 @@
         var n1 = $("#n1").value.trim(), n2 = $("#n2").value.trim();
         var err = $("#start-error");
         if (!n1 || !n2) { err.textContent = "Escriban el nombre de ambos integrantes."; (n1 ? $("#n2") : $("#n1")).focus(); return; }
+        var colEl = $("#colegio");
+        var col = colEl ? colEl.value : "";
+        if (colEl && !col) { err.textContent = "Elijan su colegio."; colEl.focus(); return; }
         if (!$("#rules-ok").checked) { err.textContent = "Confirmen que leyeron las reglas de puntaje y décimas."; $("#rules-ok").focus(); return; }
-        startGame([n1, n2]);
+        startGame([n1, n2], col, ($("#curso") ? $("#curso").value.trim() : ""));
         break;
       }
       case "pre-form": {
