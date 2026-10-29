@@ -2,7 +2,7 @@
 // décimas modificada desde el panel docente, la validación docente de
 // respuestas abiertas y la comprobación individual.
 const { test, expect } = require("@playwright/test");
-const { startGame, openReading, solve, closeOverlayIfAny } = require("./helpers");
+const { startGame, openReading, solve, closeOverlayIfAny, overrideConfig, protectRealSheets } = require("./helpers");
 
 const ZONES = {
   z1: { readings: ["r1", "r2", "r3"], challenges: ["c1", "c2", "c3", "c4", "c5", "c6", "c7"] },
@@ -226,17 +226,14 @@ test("archivo de fragmentos: el docente lo descarga y otra pareja lo carga sin p
 
 test("envío del informe a la planilla del docente (simulada)", async ({ page }) => {
   const URL_PLANILLA = "https://script.google.com/macros/s/PRUEBA/exec";
-  // Sin planilla configurada no hay botón de envío
+  // Sin planilla configurada no hay botón de envío (se ignoran las URL reales de config.js)
+  await overrideConfig(page, { informeUrl: "" });
   await startGame(page);
   await page.goto("/#/informe");
   await expect(page.locator("button[data-action=send-report]")).toHaveCount(0);
 
   // Con planilla configurada (se inyecta en config.js solo para esta prueba)
-  await page.route("**/js/config.js", async (route) => {
-    const res = await route.fetch();
-    const body = (await res.text()) + `\nwindow.KANT_CONFIG.informeUrl = ${JSON.stringify(URL_PLANILLA)};`;
-    await route.fulfill({ response: res, body });
-  });
+  await overrideConfig(page, { informeUrl: URL_PLANILLA });
   const recibidos = [];
   let modo = "ok";
   await page.route(URL_PLANILLA, async (route) => {
@@ -272,13 +269,10 @@ test("envío del informe a la planilla del docente (simulada)", async ({ page })
 
 test("dos colegios: el enlace fija el colegio y el informe va a SU planilla", async ({ page }) => {
   const URLS = { terranova: "https://script.google.com/macros/s/TERRANOVA/exec", sanagustin: "https://script.google.com/macros/s/SANAGUSTIN/exec" };
-  await page.route("**/js/config.js", async (route) => {
-    const res = await route.fetch();
-    const body = (await res.text()) + `\nwindow.KANT_CONFIG.colegios = [
-      { id: "terranova", nombre: "Colegio Quillota Terranova", informeUrl: ${JSON.stringify(URLS.terranova)} },
-      { id: "sanagustin", nombre: "San Agustín", informeUrl: ${JSON.stringify(URLS.sanagustin)} }];`;
-    await route.fulfill({ response: res, body });
-  });
+  await protectRealSheets(page);
+  await overrideConfig(page, { informeUrl: "", colegios: [
+    { id: "terranova", nombre: "Colegio Quillota Terranova", informeUrl: URLS.terranova },
+    { id: "sanagustin", nombre: "San Agustín", informeUrl: URLS.sanagustin }] });
   const llegadas = { terranova: [], sanagustin: [] };
   for (const [id, url] of Object.entries(URLS)) {
     await page.route(url, async (route) => {

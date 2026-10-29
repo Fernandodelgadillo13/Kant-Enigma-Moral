@@ -1,7 +1,28 @@
 // Utilidades para recorrer la aplicación como lo haría una pareja.
 const { expect } = require("@playwright/test");
 
+/* Las pruebas NUNCA deben enviar datos a las planillas reales del docente:
+   se bloquea todo envío a Google Apps Script (las pruebas que simulan una
+   planilla registran su propia ruta, que tiene prioridad). */
+async function protectRealSheets(page) {
+  await page.route(/script\.google(usercontent)?\.com/, (route) => route.abort());
+}
+
+/* Reemplaza las URL reales de config.js por las indicadas (o vacías). */
+async function overrideConfig(page, { informeUrl = "", colegios = null } = {}) {
+  await page.unroute("**/js/config.js").catch(() => {});
+  await page.route("**/js/config.js", async (route) => {
+    const res = await route.fetch();
+    let extra = `\nwindow.KANT_CONFIG.informeUrl = ${JSON.stringify(informeUrl)};`;
+    extra += colegios
+      ? `\nwindow.KANT_CONFIG.colegios = ${JSON.stringify(colegios)};`
+      : `\n(window.KANT_CONFIG.colegios || []).forEach(function (c) { c.informeUrl = ""; });`;
+    await route.fulfill({ response: res, body: (await res.text()) + extra });
+  });
+}
+
 async function startGame(page, n1 = "Ana", n2 = "Benjamín", path = "/") {
+  await protectRealSheets(page);
   await page.goto(path);
   await page.evaluate(() => localStorage.clear());
   await page.goto(path + "#/inicio");
@@ -106,4 +127,4 @@ async function solve(page, cid, opts = {}) {
   await closeOverlayIfAny(page);
 }
 
-module.exports = { startGame, openReading, solve, getChallenge, closeOverlayIfAny };
+module.exports = { startGame, openReading, solve, getChallenge, closeOverlayIfAny, overrideConfig, protectRealSheets };
