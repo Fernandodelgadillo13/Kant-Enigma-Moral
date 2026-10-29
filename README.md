@@ -145,6 +145,8 @@ Con esto aparece en el informe el botón **«Enviar informe al profesor»**. Cad
 5. En `public/js/config.js`, ponga esa URL en `informeUrl: "…",` y vuelva a desplegar.
 6. En el Panel docente → Instrucciones, pulse **«Probar conexión con la planilla»**.
 
+**Varios colegios:** en `config.js`, la lista `colegios` admite un colegio por elemento: `id`, `nombre` e `informeUrl`, con una planilla en la cuenta de cada colegio. Cada colegio recibe su propio enlace: `https://SU-SITIO.web.app/?colegio=ID`. Con ese enlace, el colegio queda fijo y los informes llegan a su planilla. Sin el enlace, la pareja elige su colegio al empezar. Las parejas también pueden indicar su curso. El Panel docente → Instrucciones muestra los enlaces y un botón «Probar conexión» por colegio.
+
 Notas:
 - La URL queda visible en el código del sitio. Cualquiera que la encuentre podría enviar filas falsas. Revise que los nombres coincidan con su curso y, después de la actividad, puede desactivar la implementación en Apps Script.
 - Mientras `informeUrl` esté vacío, la app no envía nada a ningún servidor.
@@ -178,5 +180,5 @@ Los cambios del panel quedan en ese navegador y tienen prioridad sobre `config.j
 
 - **Almacenamiento**: el progreso vive solo en el navegador de cada equipo. Si se borran los datos del navegador, se usa una ventana privada estricta o se cambia de equipo, se pierde. Si el navegador bloquea `localStorage`, la app avisa y funciona en memoria (se pierde al recargar). Por eso cada pareja debe **imprimir o descargar su informe**.
 - **Validación docente**: se hace en el mismo navegador de la pareja, desde el informe y con la sesión docente abierta.
-- **Despliegue**: los archivos de Firebase y GitHub Actions siguen la configuración estándar, pero **no se probaron contra un proyecto Firebase real**. Las pruebas Playwright se ejecutaron localmente y pasan (8/8). El envío a la planilla se probó con una planilla simulada; la conexión con Google Apps Script real no pudo probarse desde aquí.
+- **Despliegue**: los archivos de Firebase y GitHub Actions siguen la configuración estándar, pero **no se probaron contra un proyecto Firebase real**. Las pruebas Playwright se ejecutaron localmente y pasan (9/9). El envío a la planilla se probó con una planilla simulada; la conexión con Google Apps Script real no pudo probarse desde aquí.
 - **Fragmentos**: la app no incluye texto de Kant. El docente es responsable de usar fragmentos de una edición que pueda reproducir y de citar edición y página.
