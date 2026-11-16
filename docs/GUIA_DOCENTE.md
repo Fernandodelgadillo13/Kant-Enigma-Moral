@@ -1,73 +1,41 @@
-# Guía docente: «El enigma de la moral»
+# Guía docente: «La roca y la estrella: una aventura navideña con Camus»
 
 ## Ficha
-
 | | |
 |---|---|
-| Nivel | Enseñanza media (3.º o 4.º medio, Filosofía) |
-| Modalidad | Parejas, un dispositivo por pareja |
-| Duración | ~90 minutos |
-| Contenido | Kant, *Fundamentación de la metafísica de las costumbres*: Prefacio y Primera sección |
-| Evaluación | Puntos de evaluación (PE) convertidos a décimas (tabla editable, máx. 5 por defecto) + comprobación individual informada aparte |
+| Nivel | 3.º medio, Filosofía |
+| Modalidad | Parejas, un dispositivo por pareja, ~90 minutos |
+| Contenido | Albert Camus, *El mito de Sísifo*: «Lo absurdo y el suicidio», «Los muros absurdos» y «El mito de Sísifo» |
+| Evaluación | PE → décimas (tabla editable) + comprobación individual informada aparte |
 
-## Objetivos de aprendizaje
+## Objetivos
+1. Explicar por qué Camus considera que la pregunta por el sentido de la vida es la más urgente de la filosofía y por qué la falta de sentido no obliga a renunciar a vivir.
+2. Describir el sentimiento de lo absurdo y sus fuentes (rutina, tiempo, extrañeza del mundo, lo inhumano, límites del conocimiento).
+3. Definir lo absurdo como confrontación entre el deseo humano de claridad y el silencio irrazonable del mundo.
+4. Interpretar el mito de Sísifo: conciencia, lucidez frente a la esperanza como evasión, «hay que imaginar a Sísifo feliz».
 
-1. Comprender por qué Kant busca una filosofía moral **pura** (a priori) y distinguir *regla práctica* de *ley moral*.
-2. Explicar por qué la **buena voluntad** es lo único bueno sin restricción y por qué su valor no depende de los resultados (imagen de la joya; no es un mero deseo).
-3. Distinguir acciones **contrarias al deber**, **conformes al deber** y hechas **por deber**, identificando motivos tras una misma conducta externa (el comerciante, el filántropo).
-4. Explicar la **segunda** y la **tercera proposición** (máxima, respeto, ley práctica) y la diferencia entre **prudencia** y **deber** (la promesa falsa).
+## Cuidado con el tema
+El primer capítulo plantea el suicidio como problema filosófico. La actividad:
+- explica la pregunta de Camus y su respuesta (no hay equivalencia forzosa entre negar un sentido a la vida y declarar que no vale la pena), sin detalles ni desafíos sobre el acto;
+- muestra un aviso de cuidado al inicio, en las lecturas 1 y 3 y al pie de cada página, con la **Línea de Prevención del Suicidio \*4141** (MINSAL; gratuita, confidencial, 24 h).
 
-Quedan fuera, de forma deliberada:
-- la Segunda sección;
-- el imperativo categórico como tema central (solo aparece como anticipo en la Lectura 10);
-- el ejemplo de conservar la propia vida.
+Sugerencias: anticipe el tema al curso, ofrezca un espacio para conversar después, esté atento a señales de malestar y active los protocolos de su colegio ante cualquier señal. Al elegir los fragmentos, evite los pasajes que describen el acto (ver la tabla).
+
+## Fragmentos: qué pasajes elegir
+*El mito de Sísifo* está protegido por derechos de autor (Camus murió en 1960). Pegue los fragmentos en el **Panel docente → Fragmentos de lectura**, descargue el **archivo de fragmentos** y compártalo por un canal cerrado del curso (no lo suba a GitHub). En «Página», escriba la página de su edición.
+
+| Lectura | Desde… | …hasta |
+|---|---|---|
+| 1. La pregunta más urgente | «No hay más que un problema filosófico…» | «…la pregunta más apremiante.» |
+| 2. El sentimiento de lo absurdo | «¿Cuál es, pues, ese sentimiento incalculable…» | «…el sentimiento de lo absurdo.» (deténgase ahí) |
+| 3. ¿Lo absurdo exige renunciar a la vida? | «Todo contribuye así a enredar las cosas.» | «…entre ambos juicios.» [...] + párrafo «Adquirimos la costumbre de vivir…» |
+| 4. Cuando los decorados se derrumban | «Suele suceder que los decorados se derrumben.» | «…teñida de asombro.» [...] «…todo comienza por la conciencia y nada vale sino por ella.» |
+| 5. El tiempo, lo extraño y lo inhumano | «También los hombres segregan lo inhumano.» | «…son también lo absurdo.» |
+| 6. La inteligencia ante sus muros | «Pues si trato de captar ese yo…» | «Seré siempre extraño a mí mismo.» [...] «Me explicáis este mundo con una imagen.» → «…obra de arte.» |
+| 7. ¿Dónde está lo absurdo? | «Yo decía que el mundo es absurdo…» | «…tanto del hombre como del mundo.» [...] último párrafo del capítulo |
+| 8. Sísifo y su roca | «Los dioses habían condenado a Sísifo…» | «…sin esperanza.» [...] «Se ha comprendido ya que Sísifo es el héroe absurdo…» → «…no acabar nada.» |
+| 9. La hora de la conciencia | «Sísifo me interesa durante ese regreso…» | «…más fuerte que su roca.» [...] «Si este mito es trágico…» → «…con el desprecio.» |
+| 10. Imaginar a Sísifo feliz | «Toda la alegría silenciosa de Sísifo…» | «…Su roca es su cosa.» [...] último párrafo del ensayo |
 
 ## Secuencia sugerida
-
-| Minutos | Momento |
-|---|---|
-| 0–5 | Presentación. Leer en voz alta las reglas de puntaje y décimas que aparecen en la pantalla de inicio. |
-| 5–25 | Zona 1: Biblioteca de los fundamentos (lecturas 1–3, cerradura de letras). |
-| 25–55 | Zona 2: Laboratorio de las acciones (lecturas 4–7). |
-| 55–75 | Zona 3: Cámara de las decisiones (lecturas 8–10 y dilemas). |
-| 75–85 | Zona 4: Puerta del juicio final y comprobación individual por turnos. |
-| 85–90 | Cierre: informe impreso o descargado; validación de respuestas abiertas. |
-
-Si el tiempo es corto, desactive algunos desafíos en el panel docente (por ejemplo, c16, c25, c27 o c31). El porcentaje se recalcula con los desafíos activos.
-
-## Antes de la clase
-
-1. Cambie la clave docente en `public/js/config.js`.
-2. Pegue los fragmentos de su edición autorizada: Panel docente → *Fragmentos de lectura*. Para que lleguen a todos los equipos, cópielos en `content.js` y vuelva a desplegar.
-3. Revise la tabla de décimas y, si quiere, el temporizador.
-4. Recorra el *Solucionario* del panel.
-
-## Durante la clase
-
-- Recuerde a las parejas que el botón **«Volver a leer»** está siempre disponible.
-- Usar la pista descuenta un 25 % del valor del desafío. Después de 3 intentos se muestra la solución explicada (0 PE), así que nadie queda bloqueado.
-- En las respuestas abiertas, la pareja se autoevalúa con la rúbrica visible. Ese puntaje es **provisorio**.
-
-## Al terminar
-
-1. Abra el **Informe** en el equipo de la pareja.
-2. Pulse «Validar como docente», ingrese la clave, ajuste la rúbrica de cada respuesta abierta y guarde. El porcentaje y las décimas se recalculan.
-3. Pida a la pareja **imprimir** o **descargar** el informe (HTML o JSON). La app no envía datos a ningún servidor.
-4. Para la siguiente pareja, use Panel docente → *Reiniciar actividad para otra pareja*.
-
-## Rúbrica (respuestas abiertas)
-
-| Criterio | 0 – No logrado | 1 – Parcial | 2 – Logrado |
-|---|---|---|---|
-| Concepto correcto | Confunde o no usa los conceptos | Los usa con alguna imprecisión | Los usa con precisión |
-| Uso del texto | No se apoya en la lectura | Alude de forma general | Se apoya en una idea concreta de la lectura o del fragmento |
-| Razonamiento propio | Repite o no responde | Explica con saltos | Explica con sus palabras y conecta ideas |
-
-PE = valor del desafío × (suma ÷ 6).
-
-## Precisiones filosóficas que la actividad cuida
-
-- Actuar con sentimientos **no es reprochable**: según Kant, esas acciones merecen alabanza y estímulo, aunque su valor moral no se funda en la inclinación.
-- La buena voluntad **no es un mero deseo**: es el esfuerzo de emplear todos los medios a nuestro alcance.
-- El valor moral no depende de las consecuencias ni de la mera coincidencia externa con el deber.
-- La **máxima** es el principio subjetivo del querer; la **ley práctica**, el principio objetivo.
+5 min reglas y aviso de cuidado · 20 min Zona 1 · 30 min Zona 2 · 20 min Zona 3 · 10 min cima y comprobación individual · 5 min cierre e informe.
