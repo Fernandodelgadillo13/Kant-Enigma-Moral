@@ -162,3 +162,7 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
   body.theme-navidad .fb-ok::after { content: none; }
   .care-box { border-color: #888; background: #fff; }
 }
+
+/* Código de lectura */
+.code-form { align-items: center; flex-wrap: wrap; }
+.code-form input { max-width: 14rem; }

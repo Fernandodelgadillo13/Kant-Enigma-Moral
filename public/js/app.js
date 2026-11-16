@@ -455,9 +455,52 @@
   function fragCardHtml() {
     var n = fragCount();
     return '<section class="card" aria-labelledby="fc-h"><h2 id="fc-h">Fragmentos de ' + esc(C.autorFragmentos || "la obra") + "</h2>" +
-      "<p>Si su profesor o profesora les compartió un <strong>archivo de fragmentos</strong> (termina en <code>.json</code>), cárguenlo aquí. Solo se hace una vez en este equipo.</p>" +
+      (n >= C.lecturas.length ? "<p>✅ Los fragmentos de lectura ya están listos en este equipo.</p>" :
+        "<p>Si entraron con el enlace del curso, los fragmentos se abren solos. Si no, escriban el <strong>código de lectura</strong> que les dio su profesor o profesora" + ", o carguen el archivo de fragmentos.</p>" + codeFormHtml()) +
       '<p class="muted small" id="frag-status">Fragmentos cargados en este equipo: ' + n + " de " + C.lecturas.length + ".</p>" +
       '<div class="actions">' + fragFileInput("frag-file-start") + "</div></section>";
+  }
+  function applyFragmentsData(data, toast) {
+    if (!data || data.tipo !== FRAG_FILE_TYPE || typeof data.fragmentos !== "object") { if (toast) showToast("Este archivo no es un archivo de fragmentos de esta actividad."); return 0; }
+    var n = 0;
+    C.lecturas.forEach(function (r) {
+      var f = data.fragmentos[r.id];
+      if (f && typeof f.texto === "string" && f.texto.trim()) {
+        fragments[r.id] = {
+          texto: f.texto.slice(0, 6000),
+          edicion: String(f.edicion || "").slice(0, 200),
+          pagina: String(f.pagina || "").slice(0, 100)
+        };
+        n++;
+      }
+    });
+    ST.set(KEYS.frag, fragments);
+    if (toast) showToast("Fragmentos cargados: " + n + " de " + C.lecturas.length + ".");
+    render();
+    return n;
+  }
+
+  /* Fragmentos cifrados incluidos en el sitio (js/fragmentos-cifrados.js).
+     Solo se pueden leer con el código de lectura, que va en el enlace
+     del curso (?clave=...) o que los estudiantes escriben. */
+  function b64(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+  function unlockFragments(code, toast) {
+    var pkg = window.CAMUS_FRAG_CIFRADO;
+    code = String(code || "").trim().toLowerCase();
+    if (!pkg || !code || !(window.crypto && crypto.subtle)) return Promise.resolve(0);
+    return crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"])
+      .then(function (base) {
+        return crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64(pkg.salt), iterations: pkg.iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+      })
+      .then(function (key) { return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(pkg.iv) }, key, b64(pkg.data)); })
+      .then(function (buf) { return applyFragmentsData(JSON.parse(new TextDecoder().decode(buf)), toast); })
+      .catch(function () { if (toast) showToast("Código de lectura incorrecto. Revísenlo con su profesor o profesora."); return 0; });
+  }
+  function codeFormHtml() {
+    if (!window.CAMUS_FRAG_CIFRADO) return "";
+    return '<form class="code-form actions" data-form="frag-code"><label for="frag-code" class="sr-only">Código de lectura</label>' +
+      '<input id="frag-code" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Código de lectura" maxlength="40">' +
+      '<button type="submit" class="btn">🔓 Abrir fragmentos</button></form>';
   }
   function importFragmentsFile(file) {
     if (!file) return;
@@ -466,22 +509,7 @@
     reader.onload = function () {
       var data;
       try { data = JSON.parse(String(reader.result)); } catch (e) { showToast("No se pudo leer el archivo: no es un archivo de fragmentos válido."); return; }
-      if (!data || data.tipo !== FRAG_FILE_TYPE || typeof data.fragmentos !== "object") { showToast("Este archivo no es un archivo de fragmentos de esta actividad."); return; }
-      var n = 0;
-      C.lecturas.forEach(function (r) {
-        var f = data.fragmentos[r.id];
-        if (f && typeof f.texto === "string" && f.texto.trim()) {
-          fragments[r.id] = {
-            texto: f.texto.slice(0, 6000),
-            edicion: String(f.edicion || "").slice(0, 200),
-            pagina: String(f.pagina || "").slice(0, 100)
-          };
-          n++;
-        }
-      });
-      ST.set(KEYS.frag, fragments);
-      showToast("Fragmentos cargados: " + n + " de " + C.lecturas.length + ".");
-      render();
+      applyFragmentsData(data, true);
     };
     reader.onerror = function () { showToast("No se pudo leer el archivo."); };
     reader.readAsText(file, "utf-8");
@@ -647,7 +675,7 @@
       ? '<blockquote class="kant-quote" lang="es">' + esc(f.texto).replace(/\n{2,}/g, "</p><p>").replace(/^/, "<p>").replace(/$/, "</p>").replace(/\n/g, "<br>") + "</blockquote>" +
         '<p class="ref"><strong>Referencia:</strong> ' + esc(r.ubicacion.seccion) + (f.edicion ? " · " + esc(f.edicion) : "") + (f.pagina ? " · " + esc(f.pagina) : "") + "</p>"
       : '<div class="frag-pending"><p><strong>FRAGMENTO PENDIENTE — lo agrega el docente.</strong></p><p>Este espacio está reservado para un fragmento de la edición autorizada que use el curso. Mientras tanto, trabajen con la explicación didáctica de arriba: la actividad funciona igual.</p>' +
-        '<p>¿Su profesor o profesora les compartió un archivo de fragmentos? Cárguenlo aquí:</p><div class="actions">' + fragFileInput("frag-file-reading") + "</div></div>";
+        '<p>Escriban el código de lectura que les dio su profesor o profesora, o carguen el archivo de fragmentos:</p>' + codeFormHtml() + '<div class="actions">' + fragFileInput("frag-file-reading") + "</div></div>";
     var pq = r.pregunta;
     var order = shuffleIdx(pq.opciones.length, "pre-" + rid);
     var prev = state.pre[rid];
@@ -1618,6 +1646,11 @@
   document.addEventListener("submit", function (e) {
     var f = e.target;
     e.preventDefault();
+    if (f.getAttribute("data-form") === "frag-code") {
+      var inp = f.querySelector("input");
+      unlockFragments(inp && inp.value, true);
+      return;
+    }
     switch (f.id) {
       case "start-form": {
         var n1 = $("#n1").value.trim(), n2 = $("#n2").value.trim();
@@ -1727,6 +1760,20 @@
     if (state.timerEnd && state.timerEnd < Date.now() && state.timerWarned) document.getElementById("timer-banner").hidden = false;
     window.addEventListener("hashchange", render);
     render();
+    autoUnlockFromLink();
+  }
+  function autoUnlockFromLink() {
+    var code = "";
+    try { var q = new URLSearchParams(location.search); code = q.get("clave") || ""; } catch (e) { return; }
+    if (!code) return;
+    try {
+      /* Quita el código de la barra de direcciones (se conserva ?colegio=). */
+      var q2 = new URLSearchParams(location.search); q2.delete("clave");
+      var qs = q2.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+    } catch (e) {}
+    if (fragCount() >= C.lecturas.length) return;
+    unlockFragments(code, false).then(function (n) { if (n) showToast("Fragmentos de lectura listos: " + n + " de " + C.lecturas.length + "."); });
   }
 
   /* Expuesto solo para pruebas automatizadas. */
