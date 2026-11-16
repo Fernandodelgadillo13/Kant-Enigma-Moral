@@ -59,21 +59,21 @@ test("tamaño de letra y fondo claro", async ({ page }) => {
   await expect(page.locator("#btn-light")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("tema de Halloween: el botón 🎃 lo enciende y apaga, y la decoración no bloquea clics", async ({ page }) => {
+test("decoración navideña: activa por defecto, el botón 🎄 la apaga y no bloquea clics", async ({ page }) => {
   await startGame(page);
-  const before = await page.evaluate(() => document.body.classList.contains("theme-halloween"));
-  await page.click("#btn-theme");
-  await expect(page.locator("body")).toHaveClass(before ? /^(?!.*theme-halloween)/ : /theme-halloween/);
-  // Forzamos Halloween y comprobamos decoración
-  if (before) await page.click("#btn-theme");
-  await expect(page.locator("body")).toHaveClass(/theme-halloween/);
-  await expect(page.locator("#decor .hw-moon")).toHaveCount(1);
+  await expect(page.locator("body")).toHaveClass(/theme-navidad/);
+  await expect(page.locator("#decor .nv-snow")).toHaveCount(1);
   const pe = await page.locator("#decor").evaluate((e) => getComputedStyle(e).pointerEvents);
   expect(pe).toBe("none");
-  // Se puede seguir usando la app normalmente
+  // Se puede usar la app normalmente con la decoración
   await page.click(".map-node >> nth=0 >> button");
   await expect(page.locator(".zone-header h1")).toBeVisible();
   // Apagar: vuelve al estilo clásico y se quita la decoración
   await page.click("#btn-theme");
-  await expect(page.locator("#decor .hw-moon")).toHaveCount(0);
+  await expect(page.locator("body")).not.toHaveClass(/theme-navidad/);
+  await expect(page.locator("#decor .nv-snow")).toHaveCount(0);
+  await expect(page.locator("#btn-theme")).toHaveAttribute("aria-pressed", "false");
+  // Encender de nuevo
+  await page.click("#btn-theme");
+  await expect(page.locator("body")).toHaveClass(/theme-navidad/);
 });

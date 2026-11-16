@@ -5,8 +5,8 @@ const { test, expect } = require("@playwright/test");
 const { startGame, openReading, solve, closeOverlayIfAny, overrideConfig, protectRealSheets } = require("./helpers");
 
 const ZONES = {
-  z1: { readings: ["r1", "r2", "r3"], challenges: ["c1", "c2", "c3", "c4", "c5", "c6", "c7"] },
-  z2: { readings: ["r4", "r5", "r6", "r7"], challenges: ["c8", "c9", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "c17", "c18"] },
+  z1: { readings: ["r1", "r2", "r3"], challenges: ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"] },
+  z2: { readings: ["r4", "r5", "r6", "r7"], challenges: ["c9", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "c17", "c18"] },
   z3: { readings: ["r8", "r9", "r10"], challenges: ["c19", "c20", "c21", "c22", "c23", "c24", "c25", "c26", "c27", "c28", "c29"] },
   z4: { readings: [], challenges: ["c30", "c31", "c32", "c33", "c34"] }
 };
@@ -26,9 +26,9 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
 
   // Pregunta previa (sin nota) con retroalimentación
   await openReading(page, "r1");
-  // El fragmento de García Morente aparece separado de la explicación
-  await expect(page.locator(".panel.fragment .kant-quote")).toContainText("Todo conocimiento racional");
-  await expect(page.locator(".panel.fragment .ref")).toContainText("García Morente");
+  // Sin fragmento cargado: panel pendiente, separado de la explicación, y aviso de cuidado visible
+  await expect(page.locator(".frag-pending")).toContainText("FRAGMENTO PENDIENTE");
+  await expect(page.locator(".care-box")).toContainText("*4141");
   await expect(page.locator(".label-noquote")).toHaveText("Explicación (no es cita)");
   const correctPre = await page.evaluate(() => window.KANT_CONTENT.lecturas[0].pregunta.opciones.findIndex((o) => o.correcta));
   await page.check(`input[name="pre"][value="${correctPre}"]`);
@@ -49,14 +49,14 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
     expect(sealed, `sello de ${zid}`).toBe(true);
   }
 
-  // PE esperados: total 420; c1 = 5 (pierde 5), c2 = 11,25 (pierde 3,75), c13 = 0 (pierde 10)
+  // PE esperados: total 425; c1 = 5 (pierde 5), c2 = 7,5 (pierde 2,5), c13 = 0 (pierde 10)
   const t = await page.evaluate(() => window.__kant.totals());
-  expect(t.peMax).toBe(420);
-  expect(t.pe).toBeCloseTo(401.25, 2);
+  expect(t.peMax).toBe(425);
+  expect(t.pe).toBeCloseTo(407.5, 2);
   expect(t.hints).toBe(1);
   expect(t.failed).toBe(1);
   expect(t.provisional).toBe(true); // respuestas abiertas sin validar
-  // 401,25 / 420 = 95,54 % → 4 décimas con la tabla inicial
+  // 407,5 / 425 = 95,88 % → 4 décimas con la tabla inicial
   expect(t.decimas).toBe(4);
   // La XP no participa en el porcentaje
   const xp = await page.evaluate(() => window.__kant.state().xp);
@@ -106,7 +106,7 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
   await page.click("button:has-text('Guardar tabla')");
   await expect(page.locator("#dec-error")).toBeEmpty();
 
-  // Con la tabla modificada, 95,54 % → 3 décimas
+  // Con la tabla modificada, 95,88 % → 3 décimas
   await page.goto("/#/informe");
   await expect(page.locator("[data-testid=report-decimas]")).toHaveText("3");
 
@@ -118,20 +118,20 @@ test("partida completa: zonas, sellos, puntaje, décimas e informe", async ({ pa
   }
   const t2 = await page.evaluate(() => window.__kant.totals());
   expect(t2.provisional).toBe(false);
-  expect(t2.pe).toBeCloseTo(391.25, 2);   // 401,25 − 10
-  // 391,25 / 420 = 93,15 % → 3 décimas con la tabla modificada (85 a < 96)
+  expect(t2.pe).toBeCloseTo(397.5, 2);   // 407,5 − 10
+  // 397,5 / 425 = 93,53 % → 3 décimas con la tabla modificada (85 a < 96)
   await expect(page.locator("[data-testid=report-decimas]")).toHaveText("3");
-  await expect(page.locator("[data-testid=report-pct]")).toContainText("93,2");
+  await expect(page.locator("[data-testid=report-pct]")).toContainText("93,5");
   await expect(page.locator(".warnbox")).toHaveCount(0);
 
   // Descarga del informe
   const [dl] = await Promise.all([page.waitForEvent("download"), page.click("button:has-text('Descargar informe (HTML)')")]);
-  expect(dl.suggestedFilename()).toMatch(/^informe-kant-ana-benjamin-.*\.html$/);
+  expect(dl.suggestedFilename()).toMatch(/^informe-camus-ana-benjamin-.*\.html$/);
 
   // El progreso persiste al recargar (localStorage)
   await page.reload();
   const t3 = await page.evaluate(() => window.__kant.totals());
-  expect(t3.pe).toBeCloseTo(391.25, 2);
+  expect(t3.pe).toBeCloseTo(397.5, 2);
 
   // Reiniciar para otra pareja conserva la tabla modificada
   await page.goto("/#/docente");
@@ -157,9 +157,9 @@ test("desactivar desafíos y zonas recalcula el máximo de PE", async ({ page })
   await page.uncheck('.zone-toggle[value="z3"]');
   await page.click("#zones-form button[type=submit]");
   const t = await page.evaluate(() => window.__kant.totals());
-  // 420 − 10 (c1) − 135 (zona 3)
-  expect(t.peMax).toBe(275);
-  await page.goto("/#/desafio/c7");
+  // 425 − 10 (c1) − 135 (zona 3)
+  expect(t.peMax).toBe(280);
+  await page.goto("/#/desafio/c8");
   await expect(page.locator("text=Primero resuelvan")).toBeVisible();
 });
 
@@ -192,7 +192,7 @@ test("archivo de fragmentos: el docente lo descarga y otra pareja lo carga sin p
   await page.fill("#fp-r5", "Ak. IV 394");
   await page.click("button:has-text('Guardar fragmentos')");
   const [dl] = await Promise.all([page.waitForEvent("download"), page.click("button:has-text('Descargar archivo de fragmentos')")]);
-  expect(dl.suggestedFilename()).toBe("fragmentos-kant.json");
+  expect(dl.suggestedFilename()).toBe("fragmentos-camus.json");
   const filePath = await dl.path();
 
   // El texto NO está en los archivos publicados
@@ -203,20 +203,20 @@ test("archivo de fragmentos: el docente lo descarga y otra pareja lo carga sin p
   const ctx = await browser.newContext();
   const p2 = await ctx.newPage();
   await p2.goto("/");
-  await expect(p2.locator("#frag-status")).toContainText("10 de 10"); // García Morente ya viene incluido
+  await expect(p2.locator("#frag-status")).toContainText("0 de 10");
   await p2.setInputFiles("#frag-file-start", filePath);
-  await expect(p2.locator("#frag-status")).toContainText("10 de 10");
+  await expect(p2.locator("#frag-status")).toContainText("1 de 10");
   await p2.fill("#n1", "Carla"); await p2.fill("#n2", "Diego"); await p2.check("#rules-ok");
   if (await p2.locator("select#colegio").count()) await p2.selectOption("select#colegio", { index: 1 });
-  await p2.click("button:has-text('Entrar a la biblioteca')");
+  await p2.click("button:has-text('Comenzar la subida')");
   await p2.evaluate(() => { const s = window.__kant.state(); s.seals.z1 = true; });
   await p2.goto("/#/lectura/r5");
   await expect(p2.locator(".kant-quote")).toContainText("FRAGMENTO PRIVADO DE PRUEBA");
   await expect(p2.locator(".panel.fragment .ref")).toContainText("Edición del curso · Ak. IV 394");
 
-  // El archivo reemplaza solo la lectura que trae; las demás conservan García Morente
+  // Las lecturas que el archivo no trae siguen pendientes
   await p2.goto("/#/lectura/r6");
-  await expect(p2.locator(".kant-quote")).toContainText("Prescindo aquí");
+  await expect(p2.locator(".frag-pending")).toBeVisible();
   // Un archivo inválido se rechaza sin romper nada
   await p2.goto("/#/inicio");
   await p2.setInputFiles("#frag-file-start", { name: "otro.json", mimeType: "application/json", buffer: Buffer.from('{"hola":1}') });
@@ -252,7 +252,7 @@ test("envío del informe a la planilla del docente (simulada)", async ({ page })
   expect(fila["Integrante 1"]).toBe("Ana");
   expect(fila["Integrante 2"]).toBe("Benjamín");
   expect(fila["PE"]).toBe(10);
-  expect(fila["PE máximo"]).toBe(420);
+  expect(fila["PE máximo"]).toBe(425);
   expect(fila["ID"]).toMatch(/^P-/);
   expect(fila["c18 respuesta"]).toBe("sin respuesta");
 
@@ -288,7 +288,7 @@ test("dos colegios: el enlace fija el colegio y el informe va a SU planilla", as
   await expect(page.locator("select#colegio")).toHaveCount(0);
   await page.fill("#n1", "Carla"); await page.fill("#n2", "Diego"); await page.fill("#curso", "3° medio B");
   await page.check("#rules-ok");
-  await page.click("button:has-text('Entrar a la biblioteca')");
+  await page.click("button:has-text('Comenzar la subida')");
   await page.goto("/?colegio=sanagustin#/informe");
   await expect(page.locator("#report")).toContainText("San Agustín");
   await page.click("button[data-action=send-report]");
@@ -304,10 +304,10 @@ test("dos colegios: el enlace fija el colegio y el informe va a SU planilla", as
   await page.goto("/#/inicio");
   await page.reload();
   await page.fill("#n1", "Eva"); await page.fill("#n2", "Fito"); await page.check("#rules-ok");
-  await page.click("button:has-text('Entrar a la biblioteca')");
+  await page.click("button:has-text('Comenzar la subida')");
   await expect(page.locator("#start-error")).toContainText("Elijan su colegio");
   await page.selectOption("select#colegio", "terranova");
-  await page.click("button:has-text('Entrar a la biblioteca')");
+  await page.click("button:has-text('Comenzar la subida')");
   await page.goto("/#/informe");
   await page.click("button[data-action=send-report]");
   await expect(page.locator("#send-status")).toContainText("✓");

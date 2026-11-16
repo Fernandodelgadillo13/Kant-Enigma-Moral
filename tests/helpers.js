@@ -32,8 +32,8 @@ async function startGame(page, n1 = "Ana", n2 = "Benjamín", path = "/") {
   const sel = page.locator("select#colegio");
   if (await sel.count()) await sel.selectOption({ index: 1 });
   await page.check("#rules-ok");
-  await page.click("button:has-text('Entrar a la biblioteca')");
-  await expect(page.locator("h1")).toHaveText("Mapa de la biblioteca");
+  await page.click("button:has-text('Comenzar la subida')");
+  await expect(page.locator("h1")).toHaveText("Mapa de la montaña");
 }
 
 async function closeOverlayIfAny(page) {
