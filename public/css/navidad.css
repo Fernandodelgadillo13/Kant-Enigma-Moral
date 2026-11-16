@@ -1,0 +1,164 @@
+/* =====================================================================
+   TEMA NAVIDEÑO 🎄
+   Activo por defecto (clase body.theme-navidad); el botón 🎄 lo apaga
+   o enciende en cada navegador. Nieve, luces, árbol, regalos y la
+   montaña de Sísifo. La lectura conserva fondos sólidos y buen contraste.
+   ===================================================================== */
+
+body.theme-navidad {
+  --bg: #0b2219;
+  --bg2: #071a12;
+  --panel: #10301f;
+  --panel2: #173d29;
+  --line: #2f5a41;
+  --text: #f6f1e7;
+  --muted: #cbd8cf;
+  --gold: #f5c542;
+  --gold-d: #b8860b;
+  --teal: #9fe0ff;
+  --violet: #ff9aa8;
+  --ok: #8be08f;
+  --bad: #ff9b9b;
+  --warn: #ffd27a;
+  --focus: #ffe27a;
+  background:
+    radial-gradient(900px 500px at 85% -5%, rgba(245, 197, 66, .16), transparent 60%),
+    radial-gradient(800px 500px at -10% 110%, rgba(214, 40, 63, .14), transparent 60%),
+    linear-gradient(180deg, #0d2a1f 0%, #0b2219 45%, #081a13 100%);
+  background-attachment: fixed;
+}
+body.theme-navidad h1 { text-shadow: 0 0 18px rgba(245, 197, 66, .35); }
+body.theme-navidad .topbar { position: sticky; background: rgba(7, 26, 18, .94); border-bottom: 3px solid #b3142b; }
+/* guirnalda de luces bajo la barra superior */
+body.theme-navidad .topbar::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -12px; height: 12px; pointer-events: none;
+  background-image:
+    radial-gradient(circle at 10px 6px, #ff4d5e 0 4px, transparent 5px),
+    radial-gradient(circle at 34px 6px, #f5c542 0 4px, transparent 5px),
+    radial-gradient(circle at 58px 6px, #4fc3ff 0 4px, transparent 5px),
+    radial-gradient(circle at 82px 6px, #8be08f 0 4px, transparent 5px);
+  background-size: 96px 12px;
+  animation: nv-lights 1.6s steps(2) infinite;
+}
+body.theme-navidad .brand { color: #f5c542; }
+body.theme-navidad .btn.primary {
+  background: linear-gradient(180deg, #e63a52, #a3112a);
+  border-color: #ff8b9b; color: #fff;
+  box-shadow: 0 0 14px rgba(214, 40, 63, .35);
+}
+body.theme-navidad .btn:hover { border-color: #f5c542; box-shadow: 0 0 10px rgba(245, 197, 66, .25); }
+body.theme-navidad .xpbar span { background: linear-gradient(90deg, #d6283f, #f5c542); }
+body.theme-navidad .pill { background: #d6283f; color: #fff; }
+body.theme-navidad .mini-seal { color: #3a5a47; }
+body.theme-navidad .mini-seal.on { color: #f5c542; filter: drop-shadow(0 0 4px #f5c542); }
+body.theme-navidad .hero .subtitle { color: #9fe0ff; }
+.nv-badge { display: none; }
+body.theme-navidad .nv-badge {
+  display: inline-block; margin-top: .6rem; padding: .2rem .8rem; border-radius: 999px;
+  border: 1px solid #f5c542; color: #f5c542; font-size: .9rem; animation: nv-glow 3s ease-in-out infinite;
+}
+
+/* Lecturas: fondos sólidos */
+body.theme-navidad .panel { background: #10301f; }
+body.theme-navidad .panel.fragment { background: linear-gradient(180deg, rgba(245, 197, 66, .10), rgba(245, 197, 66, 0)), #10301f; border-left-color: #f5c542; }
+body.theme-navidad .panel.explain { border-left-color: #9fe0ff; }
+body.theme-navidad .panel.context { border-left-color: #ff9aa8; }
+body.theme-navidad .kant-quote { border-left-color: #f5c542; background: rgba(0, 0, 0, .3); }
+
+/* Aviso de cuidado (en cualquier tema) */
+.care-box { display: block; border: 1px solid #9fe0ff; background: rgba(159, 224, 255, .08); border-radius: 12px; padding: .7rem 1rem; margin: 1rem auto; max-width: 72ch; line-height: 1.5; }
+.care-box.small { font-size: .92rem; }
+body.light .care-box { border-color: #2b6f8f; background: #eef7fb; }
+
+/* Mapa: la montaña nevada */
+body.theme-navidad .map { background: linear-gradient(180deg, #071a2b 0%, #0f2d48 60%, #1b3d5c 100%); border-color: #2f5a41; }
+body.theme-navidad .node-btn { background: rgba(9, 32, 22, .92); }
+body.theme-navidad .map-node.unlocked:not(.done) .node-btn { border-color: #f5c542; animation: nv-glow 2.6s ease-in-out infinite; }
+body.theme-navidad .map-node.done .node-btn { border-color: #8be08f; }
+body.theme-navidad .node-name { color: #f5c542; }
+body.theme-navidad .node-seal { color: #f5c542; }
+body.theme-navidad .letter.on { border-color: #f5c542; color: #f5c542; background: rgba(245, 197, 66, .12); }
+.icon .nv-flame { transform-origin: 32px 20px; }
+body.theme-navidad .icon .nv-flame { animation: nv-flame 1.2s ease-in-out infinite alternate; }
+body.theme-navidad .icon .nv-twinkle { animation: nv-twinkle 1.8s ease-in-out infinite; }
+body.theme-navidad .icon .nv-twinkle.t2 { animation-delay: .9s; }
+body.theme-navidad .icon .nv-glow { animation: nv-starglow 2.4s ease-in-out infinite; }
+
+/* Retroalimentación */
+body.theme-navidad .fb-ok { position: relative; }
+body.theme-navidad .fb-ok::after { content: "⭐"; position: absolute; right: .8rem; top: -.9rem; font-size: 1.6rem; animation: nv-pop .8s cubic-bezier(.2, 1.6, .4, 1) both; }
+
+/* Estrella obtenida: destellos */
+body.theme-navidad .overlay-card { border-color: #f5c542; box-shadow: 0 0 60px rgba(245, 197, 66, .45); background: #10301f; }
+body.theme-navidad .stamp { color: #f5c542; }
+.nv-burst { position: relative; height: 0; pointer-events: none; }
+.nv-burst span { position: absolute; left: 50%; top: 70px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #f5c542; opacity: 0; animation: nv-spark 1.2s ease-out .2s both; }
+.nv-burst span:nth-child(2) { background: #ff4d5e; --dx: 70px; --dy: -40px; }
+.nv-burst span:nth-child(1) { --dx: -70px; --dy: -40px; }
+.nv-burst span:nth-child(3) { background: #4fc3ff; --dx: 80px; --dy: 30px; }
+.nv-burst span:nth-child(4) { background: #8be08f; --dx: -80px; --dy: 30px; }
+.nv-burst span:nth-child(5) { --dx: 0; --dy: -80px; }
+.nv-burst span:nth-child(6) { background: #ff4d5e; --dx: 0; --dy: 70px; }
+
+/* ---------- Decoración de fondo (no recibe clics ni foco) ---------- */
+#decor { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; display: none; }
+body.theme-navidad #decor { display: block; }
+body.theme-navidad main, body.theme-navidad .footer, body.theme-navidad .notice { position: relative; z-index: 1; }
+.nv-snow { position: absolute; inset: 0; }
+.nv-flake { position: absolute; top: -12px; border-radius: 50%; background: #fff; filter: blur(.4px); animation-name: nv-fall, nv-sway; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; animation-direction: normal, alternate; }
+.nv-tree { position: absolute; right: 1.5vw; bottom: 0; width: 120px; opacity: .9; }
+.nv-tree svg, .nv-gifts svg { width: 100%; height: auto; display: block; }
+.nv-tree .nv-bulbs circle { animation: nv-twinkle 1.6s ease-in-out infinite; }
+.nv-tree .nv-bulbs circle:nth-child(2n) { animation-delay: .8s; }
+.nv-tree .nv-glow { animation: nv-starglow 2.4s ease-in-out infinite; transform-origin: 60px 10px; }
+.nv-gifts { position: absolute; left: 1.5vw; bottom: 0; width: 130px; opacity: .9; }
+.nv-ground { position: absolute; left: 0; right: 0; bottom: -20px; height: 40px; background: #e9f3fb; border-radius: 50% 50% 0 0 / 100% 100% 0 0; opacity: .14; }
+
+/* ---------- Animaciones ---------- */
+@keyframes nv-fall { from { transform: translateY(0); } to { transform: translateY(105vh); } }
+@keyframes nv-sway { from { margin-left: -12px; } to { margin-left: 12px; } }
+@keyframes nv-lights { 0% { filter: brightness(1); opacity: 1; } 100% { filter: brightness(1.6) hue-rotate(40deg); opacity: .85; } }
+@keyframes nv-glow { 0%, 100% { box-shadow: 0 0 0 rgba(245, 197, 66, 0); } 50% { box-shadow: 0 0 16px rgba(245, 197, 66, .5); } }
+@keyframes nv-flame { from { transform: scaleY(1) skewX(-3deg); } to { transform: scaleY(1.12) skewX(3deg); } }
+@keyframes nv-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes nv-starglow { 0%, 100% { filter: drop-shadow(0 0 2px #f5c542); } 50% { filter: drop-shadow(0 0 8px #ffe27a); } }
+@keyframes nv-pop { 0% { transform: scale(0) rotate(-30deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes nv-spark { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx, 0), var(--dy, 0)) scale(.4); } }
+
+/* ---------- Fondo claro + Navidad ---------- */
+body.light.theme-navidad {
+  --bg: #fbf7ef; --bg2: #ffffff; --panel: #fffdf8; --panel2: #f3ebdc; --line: #d8c7a6;
+  --text: #1d2420; --muted: #4f5b54; --gold: #9a6b00; --gold-d: #9a6b00; --teal: #1d6a8a; --violet: #a3112a;
+  --ok: #1d7a45; --bad: #a3271a; --warn: #8a5a00; --focus: #1d4ed8;
+  background: var(--bg);
+}
+body.light.theme-navidad .topbar { background: rgba(251, 247, 239, .96); }
+body.light.theme-navidad .panel, body.light.theme-navidad .overlay-card { background: #fffdf8; }
+body.light.theme-navidad .panel.fragment { background: #fff6e2; }
+body.light.theme-navidad .kant-quote { background: #fbf0d9; }
+body.light.theme-navidad .node-btn { background: rgba(255, 253, 248, .95); }
+body.light.theme-navidad .map { background: linear-gradient(180deg, #dcecf7, #f4f9fc); }
+body.light.theme-navidad .nv-flake { background: #9fc6dc; }
+body.light.theme-navidad .btn.primary { color: #fff; }
+
+/* Títulos que reciben foco al cambiar de vista: sin recuadro visible */
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
+
+/* ---------- Móvil: menos decoración ---------- */
+@media (max-width: 760px) {
+  .nv-tree, .nv-gifts { display: none; }
+  .nv-flake:nth-child(3n) { display: none; }
+  body.theme-navidad .topbar { position: relative; }
+}
+
+/* ---------- Reducir movimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .nv-snow { display: none; }
+}
+
+/* ---------- Impresión ---------- */
+@media print {
+  #decor, .nv-badge, .nv-burst, .topbar::after { display: none !important; }
+  body.theme-navidad .fb-ok::after { content: none; }
+  .care-box { border-color: #888; background: #fff; }
+}

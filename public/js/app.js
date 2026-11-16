@@ -1,6 +1,6 @@
 /* =====================================================================
    MOTOR DEL JUEGO E INTERFAZ
-   "El enigma de la moral: una aventura filosófica con Kant"
+   "La roca y la estrella: una aventura navideña con Camus"
    Sin frameworks ni dependencias externas.
    ===================================================================== */
 (function () {
@@ -12,11 +12,11 @@
   var ST = window.KantStorage;
 
   var KEYS = {
-    game: "kantEnigma.partida",
-    config: "kantEnigma.config",
-    frag: "kantEnigma.fragmentos",
-    prefs: "kantEnigma.preferencias",
-    notice: "kantEnigma.avisoCerrado"
+    game: "camusAbsurdo.partida",
+    config: "camusAbsurdo.config",
+    frag: "camusAbsurdo.fragmentos",
+    prefs: "camusAbsurdo.preferencias",
+    notice: "camusAbsurdo.avisoCerrado"
   };
   var EDITABLE_CONFIG = ["maxDecimas", "tramos", "timerMinutes", "zonesEnabled", "disabledChallenges", "individualCheckEnabled"];
 
@@ -108,17 +108,9 @@
   var fragments = ST.get(KEYS.frag, {});
   var prefs = ST.get(KEYS.prefs, { scale: 1, light: false });
 
-  /* Tema de Halloween: automático entre el 15 de octubre y el 2 de
-     noviembre; el botón 🎃 lo enciende o apaga en este navegador. */
-  function inHalloweenWindow(d) {
-    var m = d.getMonth() + 1, day = d.getDate();
-    return (m === 10 && day >= 15) || (m === 11 && day <= 2);
-  }
-  function isHalloween() {
-    if (prefs.theme === "halloween") return true;
-    if (prefs.theme === "clasico") return false;
-    return inHalloweenWindow(new Date());
-  }
+  /* Tema navideño: activo por defecto; el botón 🎄 lo enciende o apaga
+     en este navegador (preferencia guardada). */
+  function isNavidad() { return prefs.theme !== "clasico"; }
   var state = loadGame();
   var teacherUnlocked = false;
   var orderDraft = {};      // orden provisional de los desafíos "ordenar"
@@ -187,9 +179,10 @@
 
   function addXp(n) { state.xp += n; }
   function levelInfo() {
-    var lv = cfg.levels[0], idx = 0;
-    cfg.levels.forEach(function (l, i) { if (state.xp >= l.desde) { lv = l; idx = i; } });
-    var next = cfg.levels[idx + 1];
+    var levels = C.niveles || cfg.levels;
+    var lv = levels[0], idx = 0;
+    levels.forEach(function (l, i) { if (state.xp >= l.desde) { lv = l; idx = i; } });
+    var next = levels[idx + 1];
     var pct = next ? Math.min(100, ((state.xp - lv.desde) / (next.desde - lv.desde)) * 100) : 100;
     return { nombre: lv.nombre, n: idx + 1, next: next, pct: pct };
   }
@@ -271,7 +264,7 @@
     var lv = levelInfo();
     var t = S.computeTotals(state, C, cfg);
     var seals = ["z1", "z2", "z3"].filter(zoneEnabled).map(function (z) {
-      return '<span class="mini-seal ' + (state.seals[z] ? "on" : "") + '" title="' + esc(zoneById[z].sello) + (state.seals[z] ? " (obtenido)" : " (pendiente)") + '">' + svgSeal(18) + '<span class="sr-only">' + esc(zoneById[z].sello) + (state.seals[z] ? " obtenido" : " pendiente") + "</span></span>";
+      return '<span class="mini-seal ' + (state.seals[z] ? "on" : "") + '" title="' + esc(zoneById[z].sello) + (state.seals[z] ? " (obtenida)" : " (pendiente)") + '">' + svgSeal(18) + '<span class="sr-only">' + esc(zoneById[z].sello) + (state.seals[z] ? " obtenida" : " pendiente") + "</span></span>";
     }).join("");
     el.innerHTML =
       '<div class="stat"><span class="stat-label">Nivel ' + lv.n + "</span><strong>" + esc(lv.nombre) + "</strong>" +
@@ -279,7 +272,7 @@
       '<span class="stat-small">' + state.xp + " XP (solo motivación)</span></div>" +
       '<div class="stat"><span class="stat-label">Puntos de evaluación</span><strong data-testid="pe-total">' + fmtNum(t.pe) + " / " + fmtNum(t.peMax) + " PE</strong>" +
       '<span class="stat-small">' + S.formatPct(t.pct) + "</span></div>" +
-      '<div class="stat seals"><span class="stat-label">Sellos</span><span>' + seals + "</span></div>" +
+      '<div class="stat seals"><span class="stat-label">Estrellas</span><span>' + seals + "</span></div>" +
       '<div class="stat" id="timer-wrap"' + (state.timerEnd ? "" : " hidden") + '><span class="stat-label">Tiempo</span><strong id="timer">--:--</strong></div>';
     tickTimer();
   }
@@ -320,7 +313,7 @@
     var z = zoneById[a.zona];
     var ov = document.getElementById("overlay");
     ov.innerHTML = '<div class="overlay-card" role="dialog" aria-modal="true" aria-labelledby="ov-title">' +
-      (isHalloween() ? '<div class="hw-ghost-pop" aria-hidden="true" style="color:#f4ecff">' + HW_GHOST + "</div>" : "") +
+      (isNavidad() ? '<div class="nv-burst" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>' : "") +
       '<div class="stamp">' + svgSeal(120) + "</div>" +
       '<h2 id="ov-title">¡' + esc(z.sello) + "!</h2>" +
       "<p>Completaron la zona «" + esc(z.nombre) + "».</p>" +
@@ -329,7 +322,7 @@
     ov.hidden = false;
     var btn = $("button", ov);
     if (btn) btn.focus();
-    announce("Obtuvieron el " + z.sello);
+    announce("Obtuvieron la " + z.sello);
   }
   function nextZone(zid) {
     var order = ["z1", "z2", "z3", "z4"];
@@ -341,80 +334,80 @@
      Ilustraciones SVG (propias)
      ------------------------------------------------------------------ */
   function svgSeal(size) {
+    /* Estrella dorada (los «sellos» de esta aventura son estrellas). */
     return '<svg class="svg-seal" width="' + size + '" height="' + size + '" viewBox="0 0 100 100" aria-hidden="true" focusable="false">' +
-      '<path d="M50 4l9 8 12-3 4 12 12 4-3 12 8 9-8 9 3 12-12 4-4 12-12-3-9 8-9-8-12 3-4-12-12-4 3-12-8-9 8-9-3-12 12-4 4-12 12 3z" fill="currentColor" opacity=".9"/>' +
-      '<circle cx="50" cy="50" r="27" fill="none" stroke="#0b1430" stroke-width="3" opacity=".55"/>' +
-      '<path d="M38 52l8 8 16-18" fill="none" stroke="#0b1430" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/></svg>';
+      '<path d="M50 4l13.5 29.5L95 37l-23.5 21.5L78 92 50 75 22 92l6.5-33.5L5 37l31.5-3.5z" fill="currentColor" stroke="#fff6cf" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M50 22l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#fff6cf" opacity=".35"/></svg>';
   }
+  var ICONS = {
+    /* vela navideña con acebo */
+    vela: '<rect x="24" y="24" width="16" height="30" rx="3" fill="#f4efe6" stroke="#c9a227" stroke-width="2"/><path d="M24 30h16" stroke="#c0392b" stroke-width="3"/>' +
+      '<path class="nv-flame" d="M32 6c5 7 6 11 0 16-6-5-5-9 0-16z" fill="#ffcf4a"/><path d="M32 12c2 3 2 5 0 7-2-2-2-4 0-7z" fill="#fff3b0"/>' +
+      '<ellipse cx="32" cy="56" rx="22" ry="5" fill="#1f6b3a"/><circle cx="22" cy="55" r="3" fill="#d6283f"/><circle cx="27" cy="57" r="3" fill="#d6283f"/><circle cx="42" cy="56" r="3" fill="#d6283f"/>',
+    /* muro de hielo con nieve encima */
+    muro: '<rect x="8" y="22" width="48" height="34" rx="2" fill="#bfe3f2" stroke="#7fb6d1" stroke-width="2"/>' +
+      '<path d="M8 33h48M8 45h48M20 22v11M36 22v11M50 22v11M14 33v12M28 33v12M44 33v12M20 45v11M36 45v11M50 45v11" stroke="#7fb6d1" stroke-width="2"/>' +
+      '<path d="M6 24c4-8 10-6 14-4 3-5 10-6 13-1 4-4 11-4 14 1 4-3 9-2 11 4z" fill="#ffffff"/><path d="M16 56v4M30 56v6M44 56v3" stroke="#bfe3f2" stroke-width="3" stroke-linecap="round"/>',
+    /* montaña nevada con la roca de Sísifo */
+    montana: '<path d="M4 58L26 14l12 18 8-10 14 36z" fill="#3c5a7a"/><path d="M26 14l6 10-5-2-4 5-3-3z M46 22l5 8-4-1-3 3z" fill="#ffffff"/>' +
+      '<circle cx="22" cy="44" r="7" fill="#8a7a6a" stroke="#5c4f43" stroke-width="2"/><path d="M14 52l4-4" stroke="#f4efe6" stroke-width="2" stroke-linecap="round"/>' +
+      '<circle class="nv-twinkle" cx="54" cy="10" r="2" fill="#ffe27a"/><circle class="nv-twinkle t2" cx="10" cy="12" r="1.5" fill="#ffe27a"/>',
+    /* estrella de la cima */
+    estrella: '<circle cx="32" cy="32" r="26" fill="#ffe27a" opacity=".18"/><path class="nv-glow" d="M32 6l7.5 16.5L57 25 44 37l3.5 18L32 46 16.5 55 20 37 7 25l17.5-2.5z" fill="#f5c542" stroke="#fff6cf" stroke-width="2" stroke-linejoin="round"/>',
+    candado: '<rect x="14" y="28" width="36" height="28" rx="4" fill="#c9a227"/><path d="M22 28v-8a10 10 0 0120 0v8" fill="none" stroke="#c9a227" stroke-width="5"/><circle cx="32" cy="41" r="4" fill="#0e2a1f"/><path d="M32 44v6" stroke="#0e2a1f" stroke-width="3"/><path d="M14 30c6-6 30-6 36 0" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>',
+    manuscrito: '<rect x="14" y="10" width="36" height="44" rx="3" fill="#f4efe6" stroke="#c9a227" stroke-width="2"/><path d="M20 20h24M20 27h24M20 34h18M20 41h22" stroke="#7a5b2a" stroke-width="2" stroke-linecap="round"/><path d="M40 50l6-6 6 6-6 6z" fill="#d6283f"/><path d="M46 44v-4" stroke="#1f6b3a" stroke-width="3"/>',
+    sello: '<path d="M32 6l7.5 16.5L57 25 44 37l3.5 18L32 46 16.5 55 20 37 7 25l17.5-2.5z" fill="#f5c542"/>'
+  };
   function svgIcon(name, size) {
     size = size || 56;
-    if (isHalloween() && HW_ICONS[name]) {
-      return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false" class="icon">' + HW_ICONS[name] + "</svg>";
-    }
-    var open = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false" class="icon">';
-    var p = {
-      manuscrito: '<rect x="14" y="10" width="36" height="44" rx="3" fill="#f3e6c4" stroke="#d9b45a" stroke-width="2"/><path d="M20 20h24M20 27h24M20 34h18M20 41h22" stroke="#7a5b2a" stroke-width="2" stroke-linecap="round"/><path d="M44 46l10-18 3 2-10 18z" fill="#3fd0c9"/><circle cx="12" cy="12" r="5" fill="#d9b45a"/><circle cx="52" cy="52" r="5" fill="#d9b45a"/>',
-      matraz: '<path d="M26 8h12M28 8v16L14 50a4 4 0 003.6 6h28.8A4 4 0 0050 50L36 24V8" fill="#1d2a55" stroke="#d9b45a" stroke-width="2.5" stroke-linejoin="round"/><path d="M20 44h24l4 8H16z" fill="#3fd0c9" opacity=".85"/><circle cx="28" cy="36" r="2.5" fill="#a98bff"/><circle cx="36" cy="30" r="1.8" fill="#a98bff"/>',
-      puerta: '<path d="M14 58V24a18 18 0 0136 0v34z" fill="#3b2a6b" stroke="#d9b45a" stroke-width="2.5"/><path d="M32 8v50" stroke="#d9b45a" stroke-width="1.5" opacity=".6"/><circle cx="27" cy="38" r="2.5" fill="#d9b45a"/><circle cx="37" cy="38" r="2.5" fill="#d9b45a"/><path d="M8 58h48" stroke="#d9b45a" stroke-width="3" stroke-linecap="round"/>',
-      sello: '<circle cx="32" cy="32" r="22" fill="#a98bff" stroke="#d9b45a" stroke-width="3"/><path d="M32 18l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#f6e7b0"/>',
-      candado: '<rect x="14" y="28" width="36" height="28" rx="4" fill="#d9b45a"/><path d="M22 28v-8a10 10 0 0120 0v8" fill="none" stroke="#d9b45a" stroke-width="5"/><circle cx="32" cy="41" r="4" fill="#0b1430"/><path d="M32 44v6" stroke="#0b1430" stroke-width="3"/>'
-    };
-    return open + (p[name] || p.sello) + "</svg>";
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false" class="icon">' + (ICONS[name] || ICONS.sello) + "</svg>";
   }
-  var HW_ICONS = {
-    /* grimorio con un ojo que parpadea */
-    manuscrito: '<rect x="12" y="10" width="40" height="46" rx="4" fill="#3b2357" stroke="#ff8a2a" stroke-width="2.5"/><rect x="16" y="10" width="4" height="46" fill="#2a1a44"/>' +
-      '<ellipse cx="34" cy="31" rx="11" ry="7" fill="#f4ecdf"/><g class="hw-eyes"><circle cx="34" cy="31" r="4" fill="#9dff6a"/><circle cx="34" cy="31" r="1.8" fill="#120a1f"/></g>' +
-      '<path d="M24 46h20M26 50h16" stroke="#ff8a2a" stroke-width="2" stroke-linecap="round"/>',
-    /* caldero burbujeante */
-    matraz: '<ellipse cx="32" cy="22" rx="20" ry="5" fill="#9dff6a" opacity=".9"/><path d="M12 22c0 18 8 30 20 30s20-12 20-30" fill="#22172f" stroke="#ff8a2a" stroke-width="2.5"/>' +
-      '<path d="M18 52l-4 6M46 52l4 6" stroke="#ff8a2a" stroke-width="3" stroke-linecap="round"/>' +
-      '<circle class="hw-bubble" cx="26" cy="18" r="3" fill="#9dff6a"/><circle class="hw-bubble b2" cx="36" cy="16" r="2.2" fill="#c8ff9e"/><circle class="hw-bubble b3" cx="31" cy="19" r="1.8" fill="#9dff6a"/>',
-    /* puerta de cripta con calavera */
-    puerta: '<path d="M12 58V26a20 20 0 0140 0v32z" fill="#2a1a44" stroke="#ff8a2a" stroke-width="2.5"/><path d="M32 8v50" stroke="#ff8a2a" stroke-width="1.2" opacity=".5"/>' +
-      '<circle cx="32" cy="30" r="7" fill="#f4ecdf"/><circle cx="29.5" cy="29" r="1.8" fill="#120a1f"/><circle cx="34.5" cy="29" r="1.8" fill="#120a1f"/><rect x="29" y="34" width="6" height="3" rx="1" fill="#f4ecdf"/>' +
-      '<path d="M6 58h52" stroke="#ff8a2a" stroke-width="3" stroke-linecap="round"/>',
-    /* calabaza (jack-o-lantern) */
-    sello: '<path d="M32 14c2-6 7-8 10-7-4 2-6 5-6 8" fill="#3d7a1c"/><ellipse cx="22" cy="36" rx="12" ry="17" fill="#e2640b"/><ellipse cx="42" cy="36" rx="12" ry="17" fill="#e2640b"/><ellipse cx="32" cy="36" rx="13" ry="19" fill="#ff8a2a"/>' +
-      '<g class="hw-flame"><path d="M22 31l5-6 5 6zM32 31l5-6 5 6z" fill="#ffe36b"/><path d="M20 42c4 5 20 5 24 0l-3 1-2-3-3 3-3-3-3 3-2-3-3 3z" fill="#ffe36b"/></g>'
-  };
-  var HW_BAT = '<svg viewBox="0 0 64 32" aria-hidden="true" focusable="false"><g class="wing"><path d="M32 18C24 6 12 6 2 10c6 2 8 6 8 10 4-4 10-4 14 0 2-4 6-4 8-2z" fill="currentColor"/><path d="M32 18c8-12 20-12 30-8-6 2-8 6-8 10-4-4-10-4-14 0-2-4-6-4-8-2z" fill="currentColor"/></g><ellipse cx="32" cy="18" rx="4" ry="6" fill="currentColor"/><path d="M29 12l1-4 2 3 2-3 1 4z" fill="currentColor"/></svg>';
-  var HW_GHOST = '<svg viewBox="0 0 64 80" aria-hidden="true" focusable="false"><path d="M32 4C16 4 8 18 8 34v40l8-6 8 6 8-6 8 6 8-6 8 6V34C56 18 48 4 32 4z" fill="currentColor"/><ellipse cx="24" cy="32" rx="4" ry="6" fill="#120a1f"/><ellipse cx="40" cy="32" rx="4" ry="6" fill="#120a1f"/><ellipse cx="32" cy="48" rx="5" ry="4" fill="#120a1f"/></svg>';
-  var HW_SPIDER = '<svg viewBox="0 0 40 34" aria-hidden="true" focusable="false"><g stroke="#05020a" stroke-width="2" fill="none" stroke-linecap="round"><path d="M14 14L4 6M14 17L2 16M14 20L4 28M26 14l10-8M26 17l12-1M26 20l10 8"/></g><ellipse cx="20" cy="18" rx="8" ry="9" fill="#05020a"/><circle cx="17" cy="15" r="1.6" fill="#ff3b3b"/><circle cx="23" cy="15" r="1.6" fill="#ff3b3b"/></svg>';
-  var HW_WEB = '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L100 100M0 0L100 40M0 0L40 100M0 0L100 0M0 0L0 100"/><path d="M0 20Q14 14 20 0M0 40Q28 28 40 0M0 62Q44 44 62 0M0 84Q60 60 84 0"/></g></svg>';
-  var HW_PUMPKIN = '<svg viewBox="0 0 64 56" aria-hidden="true" focusable="false"><path d="M32 8c2-5 7-7 10-6-4 2-6 4-6 7" fill="#3d7a1c"/><ellipse cx="22" cy="32" rx="12" ry="16" fill="#e2640b"/><ellipse cx="42" cy="32" rx="12" ry="16" fill="#e2640b"/><ellipse cx="32" cy="32" rx="13" ry="18" fill="#ff8a2a"/><g class="glow"><path d="M22 28l5-6 5 6zM32 28l5-6 5 6z" fill="#ffe36b"/><path d="M20 38c4 5 20 5 24 0l-3 1-2-3-3 3-3-3-3 3-2-3-3 3z" fill="#ffe36b"/></g></svg>';
+
+  var NV_TREE = '<svg viewBox="0 0 120 160" aria-hidden="true" focusable="false"><path d="M60 8l40 52H78l30 40H82l28 36H10l28-36H12l30-40H20z" fill="#1f6b3a"/><rect x="52" y="136" width="16" height="18" fill="#6b4226"/>' +
+    '<path class="nv-glow" d="M60 0l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#f5c542"/>' +
+    '<g class="nv-bulbs"><circle cx="48" cy="52" r="4" fill="#d6283f"/><circle cx="74" cy="60" r="4" fill="#f5c542"/><circle cx="40" cy="90" r="4" fill="#3fa9f5"/><circle cx="80" cy="96" r="4" fill="#d6283f"/><circle cx="60" cy="78" r="4" fill="#f5c542"/><circle cx="34" cy="124" r="4" fill="#f5c542"/><circle cx="62" cy="118" r="4" fill="#3fa9f5"/><circle cx="90" cy="126" r="4" fill="#d6283f"/></g></svg>';
+  var NV_GIFTS = '<svg viewBox="0 0 140 70" aria-hidden="true" focusable="false"><rect x="4" y="28" width="44" height="40" fill="#d6283f"/><rect x="22" y="28" width="8" height="40" fill="#f5c542"/><path d="M26 28c-10-14-22-4-8 0M26 28c10-14 22-4 8 0" fill="none" stroke="#f5c542" stroke-width="4"/>' +
+    '<rect x="56" y="40" width="34" height="28" fill="#1f6b3a"/><rect x="70" y="40" width="6" height="28" fill="#f4efe6"/><rect x="96" y="20" width="40" height="48" fill="#3fa9f5"/><rect x="112" y="20" width="8" height="48" fill="#f4efe6"/></svg>';
 
   function buildDecor() {
     var d = document.getElementById("decor");
     if (!d) return;
-    if (!isHalloween()) { d.innerHTML = ""; return; }
+    if (!isNavidad()) { d.innerHTML = ""; return; }
     if (d.childElementCount) return;
-    d.innerHTML = '<div class="hw-moon"></div>' +
-      '<div class="hw-web tl">' + HW_WEB + "</div><div class=\"hw-web br\">" + HW_WEB + "</div>" +
-      '<div class="hw-bat b1">' + HW_BAT + '</div><div class="hw-bat b2">' + HW_BAT + '</div><div class="hw-bat b3">' + HW_BAT + '</div><div class="hw-bat b4">' + HW_BAT + "</div>" +
-      '<div class="hw-spider"><div class="thread"></div>' + HW_SPIDER + "</div>" +
-      '<div class="hw-ghost">' + HW_GHOST + "</div>" +
-      '<div class="hw-fog"></div><div class="hw-fog f2"></div>' +
-      '<div class="hw-pumpkins">' + HW_PUMPKIN + HW_PUMPKIN + "</div>";
+    var r = rng(7), flakes = "";
+    for (var i = 0; i < 36; i++) {
+      var size = (r() * 6 + 3).toFixed(1);
+      flakes += '<span class="nv-flake" style="left:' + (r() * 100).toFixed(1) + "%;width:" + size + "px;height:" + size + "px;animation-duration:" +
+        (r() * 10 + 9).toFixed(1) + "s,"+ (r() * 3 + 3).toFixed(1) + "s;animation-delay:-" + (r() * 18).toFixed(1) + "s;opacity:" + (r() * 0.5 + 0.4).toFixed(2) + '"></span>';
+    }
+    d.innerHTML = '<div class="nv-snow">' + flakes + "</div>" +
+      '<div class="nv-tree">' + NV_TREE + "</div>" +
+      '<div class="nv-gifts">' + NV_GIFTS + "</div>" +
+      '<div class="nv-ground"></div>';
   }
 
   function svgMapBackground() {
-    var stars = "";
+    var stars = "", flakes = "";
     var r = rng(42);
-    for (var i = 0; i < 60; i++) {
-      stars += '<circle cx="' + Math.round(r() * 1000) + '" cy="' + Math.round(r() * 560) + '" r="' + (r() * 1.6 + 0.4).toFixed(1) + '" fill="#f6e7b0" opacity="' + (r() * 0.6 + 0.2).toFixed(2) + '"/>';
+    for (var i = 0; i < 50; i++) {
+      stars += '<circle cx="' + Math.round(r() * 1000) + '" cy="' + Math.round(r() * 300) + '" r="' + (r() * 1.5 + 0.4).toFixed(1) + '" fill="#fff6cf" opacity="' + (r() * 0.6 + 0.25).toFixed(2) + '"/>';
     }
     return '<svg class="map-bg" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
-      '<defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="' + (isHalloween() ? "#ff8a2a" : "#d9b45a") + '"/><stop offset="1" stop-color="' + (isHalloween() ? "#9dff6a" : "#3fd0c9") + '"/></linearGradient></defs>' +
+      '<defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#d6283f"/><stop offset="1" stop-color="#f5c542"/></linearGradient>' +
+      '<linearGradient id="mt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c5a7a"/><stop offset="1" stop-color="#1c3048"/></linearGradient></defs>' +
       stars +
-      '<path d="M120 440 C 260 420, 220 260, 360 250 S 560 380, 640 260 S 820 100, 880 120" fill="none" stroke="url(#g1)" stroke-width="6" stroke-dasharray="14 12" stroke-linecap="round" opacity=".75"/>' +
-      '<path d="M40 520 Q 200 470 340 520 T 640 520 T 960 510" fill="none" stroke="#a98bff" stroke-width="2" opacity=".35"/>' +
-      (isHalloween()
-        ? '<circle cx="600" cy="80" r="36" fill="#ffd98a" opacity=".5"/><circle cx="588" cy="72" r="7" fill="#e0b060" opacity=".6"/>' +
-          '<g fill="#0b0614" opacity=".85"><path d="M30 560v-60a22 22 0 0144 0v60z"/><path d="M90 560v-44a16 16 0 0132 0v44z"/><rect x="150" y="510" width="8" height="50"/><rect x="138" y="522" width="32" height="8"/>' +
-          '<path d="M880 560v-56a20 20 0 0140 0v56z"/><path d="M940 560v-40a14 14 0 0128 0v40z"/><path d="M0 560h1000v-14c-120-12-260 8-400-2s-300 10-600 0z"/></g>' +
-          '<g fill="#f4ecdf" opacity=".5" font-size="12" font-family="Georgia,serif"><text x="41" y="530">R.I.P.</text></g>'
-        : '<g opacity=".18" fill="#f3e6c4"><rect x="40" y="40" width="10" height="70"/><rect x="54" y="30" width="10" height="80"/><rect x="68" y="50" width="10" height="60"/><rect x="930" y="380" width="10" height="70"/><rect x="944" y="395" width="10" height="55"/></g>') +
+      /* la montaña de Sísifo, con nieve en la cima */
+      '<path d="M180 560 L560 230 L660 300 L860 70 L1000 230 L1000 560 Z" fill="url(#mt)"/>' +
+      '<path d="M860 70 L905 122 L882 116 L866 134 L848 112 L826 128 Z M560 230 L590 256 L572 252 L560 264 L548 250 Z" fill="#ffffff" opacity=".9"/>' +
+      /* sendero */
+      '<path d="M120 440 C 260 420, 220 260, 360 250 S 560 380, 640 260 S 820 100, 880 120" fill="none" stroke="url(#g1)" stroke-width="6" stroke-dasharray="14 12" stroke-linecap="round" opacity=".85"/>' +
+      /* roca a media ladera */
+      '<circle cx="700" cy="245" r="16" fill="#8a7a6a" stroke="#5c4f43" stroke-width="3"/>' +
+      /* pueblo nevado */
+      '<g><path d="M40 470h70v60H40z" fill="#5a2d2d"/><path d="M32 472l43-34 43 34z" fill="#ffffff"/><rect x="66" y="495" width="16" height="16" fill="#ffd36b"/>' +
+      '<path d="M130 490h56v40h-56z" fill="#2d4a5a"/><path d="M124 492l34-26 34 26z" fill="#ffffff"/><rect x="150" y="505" width="12" height="12" fill="#ffd36b"/></g>' +
+      /* suelo nevado */
+      '<path d="M0 530 Q 250 500 500 528 T 1000 520 V560 H0z" fill="#e9f3fb"/>' +
       "</svg>";
   }
 
@@ -437,7 +430,7 @@
       "<li><strong>Máximo " + cfg.maxAttempts + " intentos.</strong> Después verán la solución explicada con 0 PE, para que nadie quede bloqueado.</li>" +
       "<li><strong>Respuestas abiertas:</strong> se evalúan con una rúbrica visible de 3 criterios. Primero ustedes se autoevalúan; luego el docente valida en el informe.</li>" +
       "<li><strong>Porcentaje</strong> = PE obtenidos ÷ PE máximos de los desafíos activos.</li>" +
-      "<li><strong>XP, niveles, sellos e insignias</strong> son solo para motivar: <em>no</em> cuentan en el porcentaje ni en las décimas.</li>" +
+      "<li><strong>XP, niveles, estrellas e insignias</strong> son solo para motivar: <em>no</em> cuentan en el porcentaje ni en las décimas.</li>" +
       (cfg.individualCheckEnabled ? "<li><strong>Comprobación individual:</strong> al final, cada integrante responde 3 preguntas distintas, por turnos y con un solo intento. Se informa por separado.</li>" : "") +
       "</ul>" +
       '<table class="table"><caption>Tabla de décimas (máximo ' + cfg.maxDecimas + ")</caption><thead><tr><th scope=\"col\">Porcentaje</th><th scope=\"col\">Décimas</th></tr></thead><tbody>" + rows + "</tbody></table>" +
@@ -451,7 +444,7 @@
      canal cerrado (Classroom, correo, pendrive). Cada pareja lo carga
      en su navegador. El texto nunca queda en GitHub ni en el sitio.
      ------------------------------------------------------------------ */
-  var FRAG_FILE_TYPE = "kant-enigma-fragmentos";
+  var FRAG_FILE_TYPE = "camus-absurdo-fragmentos";
   function fragCount() {
     return C.lecturas.filter(function (r) { var f = getFragment(r); return f.texto && f.texto.trim(); }).length;
   }
@@ -461,7 +454,7 @@
   }
   function fragCardHtml() {
     var n = fragCount();
-    return '<section class="card" aria-labelledby="fc-h"><h2 id="fc-h">Fragmentos de Kant</h2>' +
+    return '<section class="card" aria-labelledby="fc-h"><h2 id="fc-h">Fragmentos de ' + esc(C.autorFragmentos || "la obra") + "</h2>" +
       "<p>Si su profesor o profesora les compartió un <strong>archivo de fragmentos</strong> (termina en <code>.json</code>), cárguenlo aquí. Solo se hace una vez en este equipo.</p>" +
       '<p class="muted small" id="frag-status">Fragmentos cargados en este equipo: ' + n + " de " + C.lecturas.length + ".</p>" +
       '<div class="actions">' + fragFileInput("frag-file-start") + "</div></section>";
@@ -501,7 +494,7 @@
       if (f.texto && f.texto.trim()) out[r.id] = f;
     });
     if (!Object.keys(out).length) { showToast("No hay fragmentos para exportar."); return; }
-    download("fragmentos-kant.json", JSON.stringify({ tipo: FRAG_FILE_TYPE, version: 1, creado: new Date().toISOString(), fragmentos: out }, null, 2), "application/json");
+    download("fragmentos-camus.json", JSON.stringify({ tipo: FRAG_FILE_TYPE, version: 1, creado: new Date().toISOString(), fragmentos: out }, null, 2), "application/json");
   }
 
   function schoolFieldHtml() {
@@ -514,10 +507,11 @@
   }
 
   function viewStart() {
-    var hero = '<section class="hero"><div class="hero-art" aria-hidden="true">' + svgIcon("manuscrito", 72) + svgIcon("puerta", 72) + svgIcon("sello", 72) + "</div>" +
+    var hero = '<section class="hero"><div class="hero-art" aria-hidden="true">' + svgIcon("vela", 72) + svgIcon("montana", 72) + svgIcon("estrella", 72) + "</div>" +
       "<h1>" + esc(C.titulo) + '<span class="subtitle">' + esc(C.subtitulo) + "</span></h1>" +
-      '<p class="hw-badge">🎃 Edición noche de brujas: la biblioteca abre a medianoche</p>' +
-      '<p class="lead">Una misteriosa biblioteca guarda la respuesta a una pregunta antigua: <em>¿qué hace que una acción sea moralmente buena?</em> Para abrir la Puerta del juicio final deberán reunir tres sellos, leyendo y razonando como Immanuel Kant en el Prefacio y la Primera sección de la <em>Fundamentación de la metafísica de las costumbres</em>.</p></section>';
+      '<p class="nv-badge">🎄 Edición navideña</p>' +
+      '<p class="lead">' + C.portada + "</p></section>" +
+      (C.aviso ? '<aside class="care-box small" aria-label="Aviso de cuidado"><strong>Antes de empezar:</strong> ' + esc(C.aviso) + "</aside>" : "");
     if (state.started) {
       return hero + '<section class="card"><h2>Partida en curso</h2><p>Equipo: <strong>' + esc(state.names[0]) + "</strong> y <strong>" + esc(state.names[1]) + "</strong>" + (schoolName() ? " · " + esc(schoolName()) : "") + (state.curso ? " · " + esc(state.curso) : "") + " · iniciada el " + esc(state.fecha) + ".</p>" +
         '<div class="actions"><button class="btn primary" data-action="go" data-to="mapa">Continuar la aventura</button>' +
@@ -531,7 +525,7 @@
       '<div class="field"><label for="curso">Curso <span class="muted">(opcional, por ejemplo «3° medio A»)</span></label><input id="curso" name="curso" autocomplete="off" maxlength="40"></div>' +
       '<p class="form-error" id="start-error" role="alert"></p>' +
       '<label class="check"><input type="checkbox" id="rules-ok" required> Leímos las reglas de puntaje y décimas.</label>' +
-      '<div class="actions"><button class="btn primary" type="submit">Entrar a la biblioteca</button></div></form>' +
+      '<div class="actions"><button class="btn primary" type="submit">Comenzar la subida</button></div></form>' +
       fragCardHtml() + rulesHtml();
   }
 
@@ -546,7 +540,7 @@
       var done = !!state.seals[z.id];
       var list = challengesOf(z.id);
       var nDone = list.filter(function (c) { return isDone(c.id); }).length;
-      var status = !enabled ? "Desactivada por el docente" : done ? "Sello obtenido" : unlocked ? nDone + " de " + list.length + " desafíos" : (z.id === "z4" ? "Se abre con los 3 sellos" : "Bloqueada");
+      var status = !enabled ? "Desactivada por el docente" : done ? "Estrella obtenida" : unlocked ? nDone + " de " + list.length + " desafíos" : (z.id === "z4" ? "Se alcanza con las 3 estrellas" : "Bloqueada");
       return '<li class="map-node ' + (done ? "done " : "") + (unlocked ? "unlocked" : "locked") + (enabled ? "" : " disabled") + '" style="--x:' + pos[z.id][0] + "%;--y:" + pos[z.id][1] + '%">' +
         '<button class="node-btn" data-action="go" data-to="zona/' + z.id + '" ' + (unlocked ? "" : 'aria-disabled="true"') + ' aria-describedby="st-' + z.id + '">' +
         '<span class="node-icon">' + svgIcon(unlocked ? z.icono : "candado", 52) + (done ? '<span class="node-seal">' + svgSeal(30) + "</span>" : "") + "</span>" +
@@ -559,7 +553,7 @@
       extra = '<div class="card center"><p>' + (both ? "La comprobación individual está completa." : "Se abrió la <strong>comprobación individual</strong>: 3 preguntas para cada integrante, por turnos.") + "</p>" +
         '<button class="btn primary" data-action="go" data-to="' + (both ? "informe" : "individual") + '">' + (both ? "Ver informe final" : "Ir a la comprobación individual") + "</button></div>";
     }
-    return '<h1>Mapa de la biblioteca</h1><p class="lead small">Recorran las zonas en orden. Cada zona entrega un sello; con los tres sellos se abre la Puerta del juicio final.</p>' +
+    return '<h1>Mapa de la montaña</h1><p class="lead small">Suban por las zonas en orden. Cada zona entrega una estrella; con las tres estrellas se alcanza la cima.</p>' +
       '<nav class="map" aria-label="Zonas del mapa">' + svgMapBackground() + '<ol class="map-nodes">' + nodes + "</ol></nav>" + extra + badgesHtml();
   }
 
@@ -588,7 +582,7 @@
     if (!z) return notFound();
     if (!zoneUnlocked(zid)) {
       return "<h1>" + esc(z.nombre) + '</h1><div class="card locked-card">' + svgIcon("candado", 64) +
-        "<p>" + (zoneEnabled(zid) ? (zid === "z4" ? "Esta puerta solo se abre con los tres sellos." : "Esta zona se desbloquea al obtener el sello de la zona anterior.") : "El docente desactivó esta zona.") + "</p>" +
+        "<p>" + (zoneEnabled(zid) ? (zid === "z4" ? "La cima solo se alcanza con las tres estrellas." : "Esta zona se desbloquea al obtener la estrella de la zona anterior.") : "El docente desactivó esta zona.") + "</p>" +
         '<button class="btn" data-action="go" data-to="mapa">Volver al mapa</button></div>';
     }
     var readings = z.lecturas.map(function (rid, i) {
@@ -601,11 +595,11 @@
         (chHtml ? '<ul class="ch-list">' + chHtml + "</ul>" : "") + "</li>";
     }).join("");
     var zoneLevel = challengesOf(zid).filter(function (c) { return !c.lectura; });
-    var zl = zoneLevel.length ? '<section class="card" aria-labelledby="zl-h"><h2 id="zl-h">' + (zid === "z4" ? "Desafíos del juicio final" : "Desafíos de la zona") + "</h2>" +
+    var zl = zoneLevel.length ? '<section class="card" aria-labelledby="zl-h"><h2 id="zl-h">' + (zid === "z4" ? "Desafíos de la cima" : "Desafíos de la zona") + "</h2>" +
       (z.lecturas.length && !readingsOpened(zid) ? '<p class="muted">Se habilitan cuando hayan abierto todas las lecturas de la zona.</p>' : "") +
       '<ul class="ch-list">' + zoneLevel.map(challengeItem).join("") + "</ul></section>" : "";
     var next = nextChallengeFor(zid);
-    var seal = state.seals[zid] ? '<p class="seal-line">' + svgSeal(28) + " <strong>" + esc(z.sello) + "</strong> obtenido.</p>" : "";
+    var seal = state.seals[zid] ? '<p class="seal-line">' + svgSeal(28) + " <strong>" + esc(z.sello) + "</strong> obtenida.</p>" : "";
     var after = "";
     if (state.seals[zid]) {
       var nz = nextZone(zid);
@@ -666,13 +660,14 @@
     return '<p class="breadcrumb"><button class="btn link-btn" data-action="go" data-to="zona/' + r.zona + '">← ' + esc(zoneById[r.zona].nombre) + "</button></p>" +
       '<article class="reading" aria-labelledby="rd-h">' +
       '<header class="reading-title">' + svgIcon("manuscrito", 54) + '<div><p class="kicker">Lectura ' + n + " · " + esc(r.ubicacion.seccion) + "</p><h1 id=\"rd-h\">" + esc(r.titulo) + "</h1></div></header>" +
+      (r.aviso && C.aviso ? '<aside class="care-box" aria-label="Aviso de cuidado"><strong>Un aviso de cuidado:</strong> ' + esc(C.aviso) + "</aside>" : "") +
       '<section class="panel context" aria-labelledby="ctx-h"><h2 id="ctx-h"><span class="pill">1</span> Contexto filosófico</h2><p>' + esc(r.contexto) + "</p></section>" +
       '<section class="panel explain" aria-labelledby="exp-h"><h2 id="exp-h"><span class="pill">2</span> Explicación didáctica <span class="label-noquote">Explicación (no es cita)</span></h2>' +
       r.explicacion.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") +
       '<h3>Conceptos clave</h3><dl class="concepts">' + concepts + "</dl></section>" +
-      '<section class="panel fragment" aria-labelledby="frg-h"><h2 id="frg-h"><span class="pill">3</span> Lectura de referencia <span class="label-quote">Palabras de Kant (fragmento incorporado por el docente)</span></h2>' +
+      '<section class="panel fragment" aria-labelledby="frg-h"><h2 id="frg-h"><span class="pill">3</span> Lectura de referencia <span class="label-quote">Palabras de ' + esc(C.autorFragmentos || "la obra") + ' (fragmento incorporado por el docente)</span></h2>' +
       fragHtml +
-      '<p class="loc"><strong>Ubicación sugerida en la obra:</strong> ' + esc(r.ubicacion.seccion) + " (" + esc(r.ubicacion.akSugerida) + ", paginación académica; el docente la confirma con su edición).</p>" +
+      '<p class="loc"><strong>Ubicación en la obra:</strong> capítulo «' + esc(r.ubicacion.seccion) + "», " + esc(r.ubicacion.parte) + ".</p>" +
       '<div class="frag-task"><h3>Trabajo con el fragmento</h3><p>' + esc(r.trabajoFragmento) + "</p>" + (hasFrag ? "" : '<p class="muted small">(Esta tarea se realiza cuando el docente haya agregado el fragmento.)</p>') + "</div></section>" +
       '<section class="panel prequestion" aria-labelledby="pq-h"><h2 id="pq-h"><span class="pill">4</span> Pregunta previa de comprensión <span class="tag">Sin nota</span></h2>' +
       '<form id="pre-form" data-rid="' + rid + '"><fieldset><legend>' + esc(pq.enunciado) + "</legend>" + opts + "</fieldset>" +
@@ -1035,7 +1030,7 @@
   function viewIndividual() {
     if (!individualAvailable()) {
       return '<h1>Comprobación individual</h1><div class="card locked-card">' + svgIcon("candado", 56) +
-        "<p>" + (cfg.individualCheckEnabled ? "Se abre después de completar la Puerta del juicio final." : "El docente desactivó la comprobación individual.") + '</p><button class="btn" data-action="go" data-to="mapa">Volver al mapa</button></div>';
+        "<p>" + (cfg.individualCheckEnabled ? "Se abre después de completar la cima de la estrella." : "El docente desactivó la comprobación individual.") + '</p><button class="btn" data-action="go" data-to="mapa">Volver al mapa</button></div>';
     }
     var ind = state.individual;
     var m = !indDone(0) ? 0 : (!indDone(1) ? 1 : null);
@@ -1165,7 +1160,7 @@
       "<li>Errores (intentos fallidos): <strong>" + t.wrongAttempts + "</strong> · Soluciones vistas: <strong>" + t.failed + "</strong></li>" +
       "<li>Pistas usadas: <strong>" + t.hints + "</strong></li>" +
       "<li>XP (motivación, no evalúa): " + state.xp + " · Insignias: " + Object.keys(state.badges).length + "</li></ul>" +
-      '<section aria-labelledby="z-h"><h2 id="z-h">Resultado por zona</h2><table class="table"><thead><tr><th scope="col">Zona</th><th scope="col">PE</th><th scope="col">%</th><th scope="col">Completados</th><th scope="col">Sello</th></tr></thead><tbody>' + zonesRows + "</tbody></table></section>" +
+      '<section aria-labelledby="z-h"><h2 id="z-h">Resultado por zona</h2><table class="table"><thead><tr><th scope="col">Zona</th><th scope="col">PE</th><th scope="col">%</th><th scope="col">Completados</th><th scope="col">Estrella</th></tr></thead><tbody>' + zonesRows + "</tbody></table></section>" +
       indHtml +
       '<section aria-labelledby="o-h"><h2 id="o-h">Respuestas abiertas</h2>' + (openHtml || "<p>No hay respuestas abiertas activas.</p>") + "</section>" +
       '<section aria-labelledby="r-h"><h2 id="r-h">Recomendaciones de repaso</h2><ul>' + recs + "</ul></section>" +
@@ -1229,7 +1224,7 @@
   function sendReport(fila, onDone, urlOverride) {
     var url = urlOverride || informeUrl();
     if (!url) { onDone(false, "No hay una planilla configurada."); return; }
-    var body = JSON.stringify({ tipo: "kant-enigma-informe", version: 1, fila: fila });
+    var body = JSON.stringify({ tipo: "camus-absurdo-informe", version: 1, fila: fila });
     var finished = false;
     var timer = setTimeout(function () { if (!finished) { finished = true; onDone(false, "La planilla no respondió a tiempo."); } }, 25000);
     function end(ok, msg) { if (finished) return; finished = true; clearTimeout(timer); onDone(ok, msg); }
@@ -1307,7 +1302,7 @@
     }
   }
   function fileSlug() {
-    return ("informe-kant-" + state.names.join("-") + "-" + new Date().toISOString().slice(0, 10)).toLowerCase()
+    return ("informe-camus-" + state.names.join("-") + "-" + new Date().toISOString().slice(0, 10)).toLowerCase()
       .normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9-]+/g, "-");
   }
 
@@ -1339,10 +1334,11 @@
   function tInstructions() {
     var nCh = C.desafios.filter(isActive).length;
     return "<h2>Instrucciones docentes</h2>" +
-      "<h3>Duración y organización</h3><p>Aproximadamente <strong>90 minutos</strong>, en parejas, con un computador, tableta o teléfono por pareja. Sugerencia: 5 min de presentación de reglas · 20 min Zona 1 · 30 min Zona 2 · 20 min Zona 3 · 10 min Puerta final y comprobación individual · 5 min cierre con el informe.</p>" +
-      "<h3>Objetivos de aprendizaje</h3><ul><li>Comprender por qué Kant busca una filosofía moral pura (a priori) y distinguir regla práctica de ley moral.</li><li>Explicar por qué la buena voluntad es lo único bueno sin restricción y por qué su valor no depende de los resultados.</li><li>Distinguir acciones contrarias al deber, conformes al deber y hechas por deber, identificando motivos.</li><li>Explicar la segunda y la tercera proposición (máxima, respeto, ley práctica) y la diferencia entre prudencia y deber.</li></ul>" +
-      "<h3>Contenidos</h3><p>Solo el Prefacio y la Primera sección de la <em>Fundamentación de la metafísica de las costumbres</em>. No se adelanta la Segunda sección ni se trata el imperativo categórico como tema central (se menciona solo como anticipo en la Lectura 10). Se evitó deliberadamente el ejemplo de conservar la propia vida.</p>" +
-      "<h3>Fragmentos de Kant</h3><p>La app <strong>no incluye citas</strong>: todo el texto es explicación original. En la pestaña <em>Fragmentos de lectura</em> puede pegar, para cada lectura, un fragmento de la edición autorizada que use el curso, con su edición y página. Se guarda en este navegador. Para que lo lean los estudiantes <strong>sin publicar el texto en internet</strong>, use «Descargar archivo de fragmentos» y compártalo por un canal cerrado del curso; cada pareja lo carga en su equipo. Solo si el texto es de dominio público (p. ej., García Morente, 1921) puede copiarlo en <code>public/js/content.js</code>, porque ese archivo queda publicado.</p>" +
+      "<h3>Duración y organización</h3><p>Aproximadamente <strong>90 minutos</strong>, en parejas, con un computador, tableta o teléfono por pareja. Sugerencia: 5 min de presentación de reglas · 20 min Zona 1 · 30 min Zona 2 · 20 min Zona 3 · 10 min cima y comprobación individual · 5 min cierre con el informe.</p>" +
+      "<h3>Objetivos de aprendizaje</h3><ul>" + (C.docente ? C.docente.objetivos : []).map(function (o) { return "<li>" + esc(o) + "</li>"; }).join("") + "</ul>" +
+      "<h3>Contenidos</h3><p>" + (C.docente ? C.docente.contenidos : "") + "</p>" +
+      (C.docente && C.docente.cuidado ? '<h3>Cuidado con el tema</h3><p class="care-box">' + esc(C.docente.cuidado) + "</p>" : "") +
+      "<h3>Fragmentos de la obra</h3><p>La app <strong>no incluye citas</strong>: todo el texto es explicación original. En la pestaña <em>Fragmentos de lectura</em> puede pegar, para cada lectura, un fragmento de la edición del curso, con su edición y página. Para que lo lean los estudiantes <strong>sin publicar el texto en internet</strong>, use «Descargar archivo de fragmentos» y compártalo por un canal cerrado del curso; cada pareja lo carga en su equipo. Solo textos de dominio público pueden copiarse en <code>public/js/content.js</code>, porque ese archivo queda publicado.</p>" +
       "<h3>Reglas de puntaje y décimas</h3><ul><li>PE por desafío: " + cfg.attemptMultipliers.map(function (x, i) { return (i + 1) + ".er/º intento " + Math.round(x * 100) + " %"; }).join(" · ") + ". Pista: −" + Math.round(cfg.hintPenalty * 100) + " % del valor. Máximo " + cfg.maxAttempts + " intentos; luego, solución con 0 PE.</li>" +
       "<li>Porcentaje = PE obtenidos ÷ PE máximos de los desafíos activos (actualmente " + nCh + " desafíos). La XP no participa.</li>" +
       "<li>Las respuestas abiertas suman un puntaje provisorio (autoevaluación) hasta que usted lo valida en el informe; al validar, el porcentaje y las décimas se recalculan.</li>" +
@@ -1397,7 +1393,7 @@
       }).join("");
       return '<fieldset class="zone-fs"><legend><label class="check"><input type="checkbox" class="zone-toggle" value="' + zn.id + '"' + (cfg.zonesEnabled[zn.id] ? " checked" : "") + "> <strong>" + esc(zn.nombre) + "</strong></label></legend><ul class=\"plain\">" + chs + "</ul></fieldset>";
     }).join("");
-    return "<h2>Activar o desactivar zonas y desafíos</h2><p>Los desafíos desactivados no aparecen ni cuentan en el porcentaje. Una zona desactivada no se exige para abrir la Puerta final. Si desactiva un desafío que entrega una letra de la cerradura, la letra se entrega automáticamente.</p>" +
+    return "<h2>Activar o desactivar zonas y desafíos</h2><p>Los desafíos desactivados no aparecen ni cuentan en el porcentaje. Una zona desactivada no se exige para llegar a la cima. Si desactiva un desafío que entrega una letra de la cerradura, la letra se entrega automáticamente.</p>" +
       '<form id="zones-form">' + z + '<label class="check"><input type="checkbox" id="ind-toggle"' + (cfg.individualCheckEnabled ? " checked" : "") + "> Comprobación individual al final</label>" +
       '<div class="actions"><button class="btn primary" type="submit">Guardar</button></div></form>';
   }
@@ -1421,7 +1417,7 @@
     }).join("");
     return "<h2>Fragmentos de lectura</h2><p>Pegue aquí, para cada lectura, el fragmento de la edición autorizada del curso. Aparecerá en el panel «Lectura de referencia», separado visualmente de las explicaciones didácticas. Respete los derechos de autor de la edición que utilice y cite edición y página.</p>" +
       '<div class="card inset"><h3>Compartir con los estudiantes sin publicar el texto</h3>' +
-      "<ol><li>Pegue y guarde los fragmentos abajo.</li><li>Pulse <strong>«Descargar archivo de fragmentos»</strong>: obtendrá <code>fragmentos-kant.json</code>.</li>" +
+      "<ol><li>Pegue y guarde los fragmentos abajo.</li><li>Pulse <strong>«Descargar archivo de fragmentos»</strong>: obtendrá <code>fragmentos-camus.json</code>.</li>" +
       "<li>Compártalo por un canal cerrado del curso (Classroom, correo, pendrive). <strong>No lo suba a GitHub.</strong></li>" +
       "<li>Cada pareja lo carga en la pantalla de inicio (o en cualquier lectura) con «Cargar archivo de fragmentos». Queda guardado en ese equipo.</li></ol>" +
       '<div class="actions"><button type="button" class="btn primary" data-action="export-frag-file">Descargar archivo de fragmentos</button>' + fragFileInput("frag-file-teacher") + "</div></div>" +
@@ -1542,9 +1538,10 @@
       case "font-up": prefs.scale = Math.min(1.5, Math.round((prefs.scale + 0.1) * 100) / 100); applyPrefs(); break;
       case "toggle-light": prefs.light = !prefs.light; applyPrefs(); break;
       case "toggle-theme":
-        prefs.theme = isHalloween() ? "clasico" : "halloween";
+        prefs.theme = isNavidad() ? "clasico" : "navidad";
+        var dd = document.getElementById("decor"); if (dd) dd.innerHTML = "";
         applyPrefs(); render();
-        announce(isHalloween() ? "Tema de Halloween activado" : "Tema clásico activado");
+        announce(isNavidad() ? "Decoración navideña activada" : "Decoración navideña desactivada");
         break;
       case "close-notice": ST.set(KEYS.notice, true); document.getElementById("storage-notice").hidden = true; break;
       case "ind-start": state.individual.started[Number(btn.getAttribute("data-m"))] = true; save(); render(); break;
@@ -1703,10 +1700,10 @@
   function applyPrefs() {
     document.documentElement.style.setProperty("--scale", prefs.scale);
     document.body.classList.toggle("light", !!prefs.light);
-    document.body.classList.toggle("theme-halloween", isHalloween());
+    document.body.classList.toggle("theme-navidad", isNavidad());
     buildDecor();
     var tb = document.getElementById("btn-theme");
-    if (tb) { tb.setAttribute("aria-pressed", String(isHalloween())); tb.title = isHalloween() ? "Desactivar tema de Halloween" : "Activar tema de Halloween"; }
+    if (tb) { tb.setAttribute("aria-pressed", String(isNavidad())); tb.title = isNavidad() ? "Desactivar decoración navideña" : "Activar decoración navideña"; }
     var lb = document.getElementById("btn-light");
     if (lb) { lb.setAttribute("aria-pressed", String(!!prefs.light)); lb.textContent = prefs.light ? "Fondo oscuro" : "Fondo claro"; }
     ST.set(KEYS.prefs, prefs);
