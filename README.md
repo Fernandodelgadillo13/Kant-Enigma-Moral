@@ -1,27 +1,12 @@
-# El enigma de la moral: una aventura filosófica con Kant
+# La roca y la estrella: una aventura navideña con Camus
 
-Escape room + RPG educativo para enseñanza media (Chile), en parejas, ~90 minutos.
-Trabaja **solo** el Prefacio y la Primera sección de la *Fundamentación de la metafísica de las costumbres* de Immanuel Kant.
+Escape room + RPG educativo para enseñanza media (Chile), en parejas, ~90 minutos, con estética navideña.
+Trabaja tres capítulos de *El mito de Sísifo* de Albert Camus: «Lo absurdo y el suicidio», «Los muros absurdos» y «El mito de Sísifo».
 
-- HTML, CSS y JavaScript sin frameworks ni dependencias externas.
-- **Fase 1** (implementada): funciona solo con Firebase Hosting y guarda el progreso en `localStorage`.
-- **Fase 2** (Firebase Auth + Firestore): **no implementada**. Opcionalmente, los informes pueden enviarse a una planilla de Google del docente (ver «Recibir los informes»). Sin esa configuración, la app no envía nada a ningún servidor.
-
-## Sobre los textos de Kant
-
-Las explicaciones, casos y preguntas son originales. Los **fragmentos textuales incluidos** son de la traducción de **Manuel García Morente (1921), de dominio público**. Se cotejaron con dos copias digitales de esa traducción (UNAM y la edición de P. M. Rosario Barbosa). Como ambas comparten digitalización, solo se corrigieron erratas evidentes, y en la Lectura 10 una repetición dudosa quedó marcada con [...]. Conviene una revisión final contra el facsímil de 1921 en Wikisource. Cada lectura tiene:
-
-1. **Contexto filosófico**: qué problema investiga Kant.
-2. **Explicación didáctica original**, rotulada «Explicación (no es cita)».
-3. **Lectura de referencia**: un panel visible, dentro de la página, con el fragmento de Kant (García Morente) y su paginación académica. El docente puede reemplazarlo por otra edición. Si un panel queda vacío, muestra «FRAGMENTO PENDIENTE — lo agrega el docente» y la actividad funciona igual.
-4. **Desafío interactivo**: una pregunta previa sin nota y los desafíos evaluados.
-
-El docente puede agregar los fragmentos de tres maneras:
-- **Panel docente → Fragmentos de lectura**: se guardan solo en ese navegador.
-- **Archivo de fragmentos (recomendado para traducciones con derechos vigentes)**: en el panel, «Descargar archivo de fragmentos» genera `fragmentos-kant.json`. Compártalo por un canal cerrado del curso (Classroom, correo, pendrive) y **no lo suba a GitHub**. Cada pareja lo carga con «Cargar archivo de fragmentos» en la pantalla de inicio o en cualquier lectura. El texto no queda publicado en el sitio.
-- **`public/js/content.js`**: complete `fragmento: { texto, edicion, pagina }` y vuelva a desplegar. **Solo para textos de dominio público** (por ejemplo, García Morente, 1921), porque este archivo queda publicado en el sitio y en el repositorio.
-
-La «ubicación sugerida» (Ak. IV) de cada lectura viene de la planificación de la actividad. Confírmela con su edición.
+- Publicado en **https://camus-absurdo.web.app**. El sitio anterior (kant-enigma-moral.web.app) muestra una página de «actividad finalizada» (carpeta `baja/`).
+- HTML, CSS y JavaScript sin dependencias. Progreso en `localStorage`; envío opcional de informes a planillas de Google por colegio.
+- **Derechos de autor:** la obra de Camus está protegida (murió en 1960). La app solo contiene explicaciones originales; los fragmentos se comparten mediante el archivo privado de fragmentos (Panel docente), nunca en `content.js`.
+- **Tema sensible:** el primer capítulo trata el suicidio como problema filosófico. La app muestra un aviso de cuidado con la Línea de Prevención del Suicidio *4141 (MINSAL). Ver `docs/GUIA_DOCENTE.md`.
 
 ## Estructura
 
@@ -165,9 +150,9 @@ Los cambios del panel quedan en ese navegador y tienen prioridad sobre `config.j
 
 > La clave docente **no es una medida de seguridad**: está en el código fuente y solo evita entradas accidentales. Para un control real del acceso se necesitaría la Fase 2 (Firebase Authentication), que no está implementada.
 
-## Tema de Halloween 🎃
+## Tema navideño 🎄
 
-`public/css/halloween.css` agrega murciélagos, luna, niebla, araña, telarañas, calabazas y un fantasma al ganar un sello. Se activa solo entre el 15 de octubre y el 2 de noviembre; el botón 🎃 de la barra lo enciende o apaga en cada navegador. Respeta «reducir movimiento», no se imprime y la decoración no recibe clics. Para quitarlo del todo, borre la línea que carga `halloween.css` en `index.html`.
+`public/css/navidad.css` agrega nieve, luces, árbol, regalos y la montaña de Sísifo en el mapa. Está activo por defecto; el botón 🎄 lo apaga o enciende en cada navegador. Respeta «reducir movimiento», no se imprime y la decoración no recibe clics.
 
 ## Reglas de puntaje (resumen)
 
@@ -181,4 +166,4 @@ Los cambios del panel quedan en ese navegador y tienen prioridad sobre `config.j
 - **Almacenamiento**: el progreso vive solo en el navegador de cada equipo. Si se borran los datos del navegador, se usa una ventana privada estricta o se cambia de equipo, se pierde. Si el navegador bloquea `localStorage`, la app avisa y funciona en memoria (se pierde al recargar). Por eso cada pareja debe **imprimir o descargar su informe**.
 - **Validación docente**: se hace en el mismo navegador de la pareja, desde el informe y con la sesión docente abierta.
 - **Despliegue**: los archivos de Firebase y GitHub Actions siguen la configuración estándar, pero **no se probaron contra un proyecto Firebase real**. Las pruebas Playwright se ejecutaron localmente y pasan (9/9). El envío a la planilla se probó con una planilla simulada; la conexión con Google Apps Script real no pudo probarse desde aquí.
-- **Fragmentos**: la app no incluye texto de Kant. El docente es responsable de usar fragmentos de una edición que pueda reproducir y de citar edición y página.
+- **Fragmentos**: la app no incluye texto de Camus. El docente es responsable de usar fragmentos de una edición que pueda reproducir y de citar edición y página.
